@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #4f86f7;
+  --bg-color: #f5f5f7;
+  --card-bg: #ffffff;
+  --border-color: #e5e5ea;
+  --text-main: #1d1d1f;
+  --text-muted: #6e6e73;
+  --success: #34c759;
+  --error: #ff3b30;
+  --warning: #ff9500;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
