@@ -10,10 +10,11 @@ import ClaimModal from './components/step1/ClaimModal';
 import InvoicePreview from './components/step3/InvoicePreview';
 import SubmitHelper from './components/step4/SubmitHelper';
 import BulkResultsTable from './components/step1/BulkResultsTable';
+import LateFeeEstimator from './components/step1/LateFeeEstimator';
 import { parseTakealotCsv } from './utils/csvParser';
 import { sampleCsvData } from './data/sampleData';
 import { CheckCircle, AlertCircle, AlertTriangle, Info, Layers, FileDigit } from 'lucide-react';
-
+ 
 export default function App() {
     const [currentStep, setCurrentStep] = useState(1);
     const [uploadMode, setUploadMode] = useState('single'); // 'single' | 'bulk'
@@ -21,35 +22,85 @@ export default function App() {
     const [errorState, setErrorState] = useState(null);
     const [filename, setFilename] = useState('');
     const [showClaimModal, setShowClaimModal] = useState(false);
-
-    // Bulk Records State
-    const [bulkRecords, setBulkRecords] = useState(() => {
+    const [modalStatus, setModalStatus] = useState('Claimable'); // 'Claimable' | 'No Claim' | 'No Data' | 'Invalid Format'
+  
+    const generateInvoiceNumber = () => {
+        const date = new Date();
+        const dateStr = date.toISOString().split('T')[0].split('-').join('');
+        const randDigits = Math.floor(1000 + Math.random() * 9000); // 4 digits for better uniqueness
+        return `INV-${dateStr}-${randDigits}`;
+    };
+ 
+ 
+    const [bulkBatches, setBulkBatches] = useState(() => {
         try {
-            const saved = localStorage.getItem('takealotReconBulkRecords');
-            if (saved) return JSON.parse(saved);
-        } catch (err) { }
+            // Priority 1: Load new batch format
+            const savedBatches = localStorage.getItem('takealotReconBulkBatches');
+            if (savedBatches) return JSON.parse(savedBatches);
+
+            // Priority 2: Migrate legacy flat records into a 'Migration' batch
+            const oldRecords = localStorage.getItem('takealotReconBulkRecords');
+            if (oldRecords) {
+                const records = JSON.parse(oldRecords);
+                if (records && records.length > 0) {
+                    const ts = Date.now();
+                    const legacyBatch = {
+                        id: `Legacy_${ts}`,
+                        createdAt: ts,
+                        records: records.map(r => ({ ...r, batchId: `Legacy_${ts}` })),
+                        stats: {
+                            total: records.length,
+                            claimable: records.filter(r => r.status === 'Claimable').length,
+                            noClaim: records.filter(r => r.status === 'No Claim').length,
+                            noData: records.filter(r => r.status === 'No Data').length,
+                            invalid: records.filter(r => r.status === 'Invalid Format').length,
+                            totalValue: records.reduce((acc, r) => acc + (r.stats?.totalClaimValue || 0), 0)
+                        }
+                    };
+                    return [legacyBatch];
+                }
+            }
+        } catch (err) { console.error("Migration/Load Error:", err); }
         return [];
     });
-
+ 
     useEffect(() => {
         try {
-            localStorage.setItem('takealotReconBulkRecords', JSON.stringify(bulkRecords));
+            localStorage.setItem('takealotReconBulkBatches', JSON.stringify(bulkBatches));
         } catch (e) {
-            console.warn("Storage quota exceeded for bulk records, ignoring limit.");
+            console.warn("Storage quota exceeded for bulk batches, ignoring limit.");
         }
-    }, [bulkRecords]);
-
+    }, [bulkBatches]);
+ 
     const [invoiceData, setInvoiceData] = useState(() => {
         try {
             const saved = localStorage.getItem('takealotReconInvoice');
             if (saved) {
                 const parsed = JSON.parse(saved);
+                const date = new Date();
+                const dateStr = date.toISOString().split('T')[0];
+                const defaults = {
+                    businessName: '',
+                    registrationNumber: '',
+                    sellerAccountName: '',
+                    sellerId: '',
+                    vatStatus: 'Not VAT Registered',
+                    taxReferenceNumber: '',
+                    invoiceNumber: generateInvoiceNumber(),
+                    invoiceDate: dateStr,
+                    street: '',
+                    city: '',
+                    province: '',
+                    postalCode: '',
+                    country: 'South Africa',
+                    notes: ''
+                };
                 if (parsed && typeof parsed.businessName === 'string') {
-                    return parsed;
+                    return { ...defaults, ...parsed };
                 }
             }
         } catch (err) { }
-
+ 
         const date = new Date();
         const dateStr = date.toISOString().split('T')[0];
         const randDigits = Math.floor(100 + Math.random() * 900);
@@ -60,7 +111,7 @@ export default function App() {
             sellerId: '',
             vatStatus: 'Not VAT Registered',
             taxReferenceNumber: '',
-            invoiceNumber: `INV-${dateStr.replace(/-/g, '')}-${randDigits}`,
+            invoiceNumber: generateInvoiceNumber(),
             invoiceDate: dateStr,
             street: '',
             city: '',
@@ -70,56 +121,64 @@ export default function App() {
             notes: ''
         };
     });
-
+ 
     useEffect(() => {
         localStorage.setItem('takealotReconInvoice', JSON.stringify(invoiceData));
     }, [invoiceData]);
-
+ 
     const processFileAsync = (fileOrText) => new Promise((resolve) => {
         parseTakealotCsv(fileOrText,
             (res) => resolve({ success: true, result: res, error: null }),
             (err) => resolve({ success: false, result: null, error: err })
         );
     });
-
+ 
     const processBulkFiles = async (files) => {
         const fileArray = Array.from(files);
         let newRecords = [];
+        let baseTimestamp = Date.now();
 
-        for (const file of fileArray) {
-            const { success, result, error } = await processFileAsync(file);
+        // New Batch Metadata
+        const batchId = `Batch_${baseTimestamp}_${Math.random().toString(36).substring(7)}`;
 
+        for (let i = 0; i < fileArray.length; i++) {
+            const file = fileArray[i];
+            
+            // Handle both real File objects and our sample string objects
+            const fileOrText = file.content !== undefined ? file.content : file;
+            const fileName = file.name || "Upload.csv";
+            
+            const { success, result, error } = await processFileAsync(fileOrText);
+ 
             let status = 'Invalid Format';
+            const recordTimestamp = baseTimestamp + i;
             let mappedRecord = {
-                id: Date.now() + Math.random().toString(36).substring(7),
-                timestamp: Date.now(),
-                filename: file.name,
+                id: recordTimestamp + Math.random().toString(36).substring(7),
+                batchId,
+                timestamp: recordTimestamp,
+                filename: fileName,
                 status: 'Invalid Format',
                 reconPeriod: null,
                 totalRows: 0,
                 claimableItems: 0,
                 stats: { totalClaimValue: 0 }
             };
-
+ 
             if (success && result) {
                 const claimableItems = result.data.filter(row => row._numericClaim > 0);
                 const isClaimable = result.stats?.totalClaimValue > 0;
-
-                if (result.emptyDataFormat) {
-                    status = 'No Data';
-                } else if (isClaimable) {
-                    status = 'Claimable';
-                } else {
-                    status = 'No Claim';
-                }
-
+ 
+                if (result.emptyDataFormat) status = 'No Data';
+                else if (isClaimable) status = 'Claimable';
+                else status = 'No Claim';
+ 
                 let period = 'Unknown';
                 if (result.matchedColumns?.period && claimableItems.length > 0) {
                     period = claimableItems[0][result.matchedColumns.period];
                 } else if (result.matchedColumns?.period && result.data.length > 0) {
                     period = result.data[0][result.matchedColumns.period];
                 }
-
+ 
                 mappedRecord = {
                     ...mappedRecord,
                     status,
@@ -133,52 +192,116 @@ export default function App() {
             newRecords.push(mappedRecord);
         }
 
-        setBulkRecords(prev => [...newRecords, ...prev]);
+        // Calculate Batch Statistics
+        const batchStats = {
+            total: newRecords.length,
+            claimable: newRecords.filter(r => r.status === 'Claimable').length,
+            noClaim: newRecords.filter(r => r.status === 'No Claim').length,
+            noData: newRecords.filter(r => r.status === 'No Data').length,
+            invalid: newRecords.filter(r => r.status === 'Invalid Format').length,
+            totalValue: newRecords.reduce((acc, r) => acc + (r.stats?.totalClaimValue || 0), 0)
+        };
+
+        const newBatch = {
+            id: batchId,
+            createdAt: baseTimestamp,
+            records: newRecords,
+            stats: batchStats
+        };
+ 
+        setBulkBatches(prev => [newBatch, ...prev]);
+    };
+ 
+    const handleDeleteBulkRecord = (id, batchId) => {
+        setBulkBatches(prev => prev.map(batch => {
+            if (batch.id !== batchId) return batch;
+            const updatedRecords = batch.records.filter(r => r.id !== id);
+            // Recalculate stats for the batch
+            const updatedStats = {
+                total: updatedRecords.length,
+                claimable: updatedRecords.filter(r => r.status === 'Claimable').length,
+                noClaim: updatedRecords.filter(r => r.status === 'No Claim').length,
+                noData: updatedRecords.filter(r => r.status === 'No Data').length,
+                invalid: updatedRecords.filter(r => r.status === 'Invalid Format').length,
+                totalValue: updatedRecords.reduce((acc, r) => acc + (r.stats?.totalClaimValue || 0), 0)
+            };
+            return { ...batch, records: updatedRecords, stats: updatedStats };
+        }).filter(batch => batch.records.length > 0)); // Remove empty batches
     };
 
-    const handleDeleteBulkRecord = (id) => {
-        setBulkRecords(prev => prev.filter(r => r.id !== id));
+    const handleDeleteBatch = (batchId) => {
+        setBulkBatches(prev => prev.filter(b => b.id !== batchId));
     };
-
+ 
     const handleStartClaimFromBulk = (record) => {
         setFilename(record.filename);
         setParsedState(record.parsedState);
         setErrorState(null);
+        setInvoiceData(prev => ({
+            ...prev,
+            invoiceNumber: generateInvoiceNumber(),
+            invoiceDate: new Date().toISOString().split('T')[0]
+        }));
         setCurrentStep(2);
     };
-
+ 
     const processFile = (fileOrText, name) => {
         setErrorState(null);
         setParsedState(null);
-        setShowClaimModal(false);
         setFilename(name);
-
+ 
         parseTakealotCsv(
             fileOrText,
             (result) => {
                 setParsedState(result);
-                if (result && !result.emptyDataFormat && result.stats?.totalClaimValue > 0) {
+                if (result) {
+                    setInvoiceData(prev => ({
+                        ...prev,
+                        invoiceNumber: generateInvoiceNumber(),
+                        invoiceDate: new Date().toISOString().split('T')[0]
+                    }));
+                    if (result.emptyDataFormat) {
+                        setModalStatus('No Data');
+                    } else if (result.stats?.totalClaimValue > 0) {
+                        setModalStatus('Claimable');
+                    } else {
+                        setModalStatus('No Claim');
+                    }
                     setShowClaimModal(true);
                 }
             },
             (err) => {
                 setErrorState(err);
+                setModalStatus('Invalid Format');
+                setShowClaimModal(true);
             }
         );
     };
-
+ 
     const handleUseSample = () => {
         processFile(sampleCsvData, "Sample_Takealot_Data.csv");
     };
-
+ 
     const handleFileSelect = (files) => {
         if (uploadMode === 'bulk') {
-            processBulkFiles(files);
+            processBulkFiles(Array.isArray(files) ? files : [files]);
         } else {
             processFile(files, files.name);
         }
     };
 
+    const handleUseSampleBulk = () => {
+        // Pass the raw sample strings to simulate bulk processing
+        // We wrap them in a simple array of objects that processBulkFiles can handle
+        const sampleFiles = [
+            { name: 'Sample_Claimable_A.csv', content: sampleCsvData },
+            { name: 'Sample_Claimable_B.csv', content: sampleCsvData }
+        ];
+        
+        // We modify how they are processed slightly in the next function
+        processBulkFiles(sampleFiles);
+    };
+ 
     const Badge = ({ active, label }) => {
         if (active) {
             return (
@@ -195,19 +318,19 @@ export default function App() {
             </div>
         );
     };
-
+ 
     return (
         <div className="min-h-screen bg-[#f5f5f7] selection:bg-[#4f86f7]/20 selection:text-[#4f86f7]">
             <Header />
             <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
                 <ProgressBar currentStep={currentStep} />
-
+ 
                 <div className="mt-8">
-
+ 
                     {/* STEP 1 */}
                     {currentStep === 1 && (
                         <div className="animate-in fade-in duration-500">
-
+ 
                             {/* Mode Selector */}
                             <div className="flex justify-center mb-10">
                                 <div className="bg-[#e5e5ea] p-1.5 rounded-xl flex space-x-1 shadow-inner">
@@ -225,50 +348,25 @@ export default function App() {
                                     </button>
                                 </div>
                             </div>
-
+ 
                             <UploadArea
                                 onFileSelect={handleFileSelect}
-                                onUseSample={handleUseSample}
+                                onUseSample={uploadMode === 'bulk' ? handleUseSampleBulk : handleUseSample}
                                 allowMultiple={uploadMode === 'bulk'}
                             />
-
+ 
                             {/* Bulk Mode View */}
                             {uploadMode === 'bulk' && (
                                 <BulkResultsTable
-                                    records={bulkRecords}
+                                    batches={bulkBatches}
                                     onStartClaim={handleStartClaimFromBulk}
                                     onDeleteRecord={handleDeleteBulkRecord}
+                                    onDeleteBatch={handleDeleteBatch}
                                 />
                             )}
-
-                            {/* Single Mode Error View */}
-                            {uploadMode === 'single' && errorState && (
-                                <div className="rounded-3xl bg-white p-6 border-l-[6px] border-[#ff3b30] shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex items-start mb-16">
-                                    <AlertCircle className="h-6 w-6 text-[#ff3b30] mt-0.5 mr-4 flex-shrink-0" strokeWidth={2} />
-                                    <div>
-                                        <h3 className="text-base font-semibold text-[#1d1d1f] tracking-tight">Upload failed</h3>
-                                        <p className="text-sm text-[#86868b] mt-1">{errorState}</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Single Mode Success/Empty View */}
-                            {uploadMode === 'single' && parsedState && !errorState && parsedState.emptyDataFormat && (
-                                <div className="rounded-3xl bg-white p-6 md:px-8 md:py-6 border border-[#e5e5ea] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                                    <div className="flex items-center">
-                                        <div className="bg-[#f5f5f7] p-2.5 rounded-full mr-5">
-                                            <Info className="h-6 w-6 text-[#6e6e73]" strokeWidth={2.5} />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-base font-semibold text-[#1d1d1f] tracking-tight">Valid Stock Recon format detected, but this file contains no data rows.</h3>
-                                            <p className="text-[13px] text-[#6e6e73] mt-0.5">
-                                                Detected filename: <span className="font-medium text-[#1d1d1f]">{filename}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
+ 
+                            {/* Single Mode Result Views are now handled by ClaimModal */}
+ 
                             {/* Single Mode Success Parsed View */}
                             {uploadMode === 'single' && parsedState && !errorState && !parsedState.emptyDataFormat && (
                                 <div className="space-y-8 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -285,7 +383,7 @@ export default function App() {
                                             </div>
                                         </div>
                                     </div>
-
+ 
                                     {!parsedState.matchedColumns?.claimValue && (
                                         <div className="rounded-3xl bg-[#fffbf0] p-6 border border-[#ffe5b4] shadow-sm flex items-start">
                                             <AlertTriangle className="h-6 w-6 text-[#ff9500] mt-0.5 mr-4 flex-shrink-0" strokeWidth={2} />
@@ -297,7 +395,7 @@ export default function App() {
                                             </div>
                                         </div>
                                     )}
-
+ 
                                     <div className="bg-white rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] border border-[#e5e5ea] px-8 py-7">
                                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                             <div>
@@ -313,15 +411,21 @@ export default function App() {
                                             </div>
                                         </div>
                                     </div>
-
+ 
                                     <SummaryCards stats={parsedState.stats} />
 
+                                    <LateFeeEstimator
+                                        parsedData={parsedState.data}
+                                        matchedColumns={parsedState.matchedColumns}
+                                        stats={parsedState.stats}
+                                    />
+ 
                                     <div id="flagged-claims-section">
                                         <FlaggedClaims data={parsedState.data} matchedColumns={parsedState.matchedColumns} />
                                     </div>
-
+ 
                                     <DataTablePreview data={parsedState.data} headers={parsedState.headers || []} matchedColumns={parsedState.matchedColumns} />
-
+ 
                                     <div className="mt-8 mb-16 flex justify-end animate-in fade-in slide-in-from-bottom-4 duration-700">
                                         <button
                                             onClick={() => setCurrentStep(2)}
@@ -333,11 +437,13 @@ export default function App() {
                                     </div>
                                 </div>
                             )}
-
+ 
                             <ClaimModal
                                 isOpen={showClaimModal}
                                 onClose={() => setShowClaimModal(false)}
                                 stats={parsedState?.stats}
+                                status={modalStatus}
+                                error={errorState}
                                 onContinue={() => {
                                     setShowClaimModal(false);
                                     setCurrentStep(2);
@@ -350,7 +456,7 @@ export default function App() {
                             />
                         </div>
                     )}
-
+ 
                     {/* Remaining Workflows */}
                     {currentStep === 2 && (
                         <EditInvoiceForm
@@ -360,25 +466,25 @@ export default function App() {
                             onContinue={() => setCurrentStep(3)}
                         />
                     )}
-
+ 
                     {currentStep === 3 && (
                         <InvoicePreview
                             invoiceData={invoiceData}
-                            parsedData={parsedState.data}
-                            matchedColumns={parsedState.matchedColumns}
-                            stats={parsedState.stats}
+                            parsedData={parsedState?.data}
+                            matchedColumns={parsedState?.matchedColumns}
+                            stats={parsedState?.stats}
                             filename={filename}
                             onBack={() => setCurrentStep(2)}
                             onContinue={() => setCurrentStep(4)}
                         />
                     )}
-
+ 
                     {currentStep === 4 && (
                         <SubmitHelper
                             invoiceData={invoiceData}
-                            parsedData={parsedState.data}
-                            matchedColumns={parsedState.matchedColumns}
-                            stats={parsedState.stats}
+                            parsedData={parsedState?.data}
+                            matchedColumns={parsedState?.matchedColumns}
+                            stats={parsedState?.stats}
                             filename={filename}
                             onBack={() => setCurrentStep(3)}
                             onFinish={() => {
@@ -387,7 +493,7 @@ export default function App() {
                             }}
                         />
                     )}
-
+ 
                 </div>
             </main>
         </div>

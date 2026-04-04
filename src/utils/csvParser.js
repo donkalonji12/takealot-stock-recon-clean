@@ -28,7 +28,8 @@ export const parseTakealotCsv = (fileOrtxt, onComplete, onError) => {
                 productTitle: ['product_title', 'title', 'description', 'product'],
                 tsin: ['tsin_id', 'tsin'],
                 sku: ['sku', 'merchant sku'],
-                period: ['period']
+                period: ['period'],
+                quantity: ['warehouse_down_adjustments', 'down_adjustments', 'quantity', 'qty', 'units']
             };
 
             const matchedColumns = {
@@ -36,7 +37,8 @@ export const parseTakealotCsv = (fileOrtxt, onComplete, onError) => {
                 productTitle: null,
                 tsin: null,
                 sku: null,
-                period: null
+                period: null,
+                quantity: null
             };
 
             const headerLowerTrimmed = headers.map(h => h.toLowerCase().trim());
@@ -58,6 +60,7 @@ export const parseTakealotCsv = (fileOrtxt, onComplete, onError) => {
             matchedColumns.tsin = findMatch(columnAliases.tsin);
             matchedColumns.sku = findMatch(columnAliases.sku);
             matchedColumns.period = findMatch(columnAliases.period);
+            matchedColumns.quantity = findMatch(columnAliases.quantity);
 
             // We consider it a "valid format" if we found at least one logical header mapping
             const hasValidFormat = Object.values(matchedColumns).some(v => v !== null);

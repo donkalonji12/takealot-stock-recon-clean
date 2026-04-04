@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatReconPeriod } from '../../utils/formatters';
 
 const formatCurrency = (val) => {
     const num = Number(val);
@@ -55,6 +56,8 @@ export default function DataTablePreview({ data, headers, matchedColumns }) {
                                         if (!isNaN(asNum)) {
                                             displayVal = formatCurrency(asNum);
                                         }
+                                    } else if (h === matchedColumns?.period && displayVal) {
+                                        displayVal = formatReconPeriod(displayVal);
                                     }
 
                                     return (

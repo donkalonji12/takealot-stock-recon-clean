@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { Download, ArrowLeft, ArrowRight, Check, Palette } from 'lucide-react';
+import { formatReconPeriod } from '../../utils/formatters';
 
 const formatCurrency = (val) => {
     const num = Number(val);
@@ -26,11 +27,13 @@ export default function InvoicePreview({ invoiceData, parsedData, matchedColumns
     const [isGenerating, setIsGenerating] = useState(false);
     const [themeColor, setThemeColor] = useState(THEME_COLORS[0]);
 
+    if (!parsedData || !stats) return null;
+
     const claimableItems = parsedData.filter(row => row._numericClaim > 0);
     const numItems = claimableItems.length;
 
     const periodMatch = matchedColumns?.period && numItems > 0
-        ? claimableItems[0][matchedColumns.period]
+        ? formatReconPeriod(claimableItems[0][matchedColumns.period])
         : 'Not provided';
 
     const subtotal = stats.totalClaimValue;
@@ -52,13 +55,19 @@ export default function InvoicePreview({ invoiceData, parsedData, matchedColumns
         );
     }
 
-    const DocumentTitle = isVatRegistered ? 'TAX INVOICE' : 'CLAIM INVOICE';
+    // Always TAX INVOICE as per Takealot stock loss claim requirements
+    const DocumentTitle = 'TAX INVOICE';
 
     const handleDownloadPDF = async () => {
         if (!invoiceRef.current) return;
         try {
             setIsGenerating(true);
-            const canvas = await html2canvas(invoiceRef.current, { scale: 2, useCORS: true });
+            const canvas = await html2canvas(invoiceRef.current, {
+                scale: 2,
+                useCORS: true,
+                windowWidth: 1200,
+                logging: false,
+            });
             const imgData = canvas.toDataURL('image/png');
 
             const pdf = new jsPDF('p', 'mm', 'a4');
@@ -137,104 +146,121 @@ export default function InvoicePreview({ invoiceData, parsedData, matchedColumns
 
                 <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_10px_40px_rgba(0,0,0,0.04)] overflow-hidden relative">
                     <div className="overflow-x-auto">
-                        <div ref={invoiceRef} className="p-12 sm:p-16 min-w-[760px] bg-white text-[#111827] font-sans leading-normal">
-
-                            {/* Top Header Split */}
-                            <div className="flex justify-between items-start mb-20">
-                                <div>
-                                    <div className="inline-block px-3 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase text-white mb-4" style={{ backgroundColor: themeColor }}>
+                        <div ref={invoiceRef} className="p-14 min-w-[800px] bg-white text-[#111827] font-sans leading-normal">
+                            {/* Document Header Grid */}
+                            <div className="grid grid-cols-12 gap-8 mb-12 items-start">
+                                <div className="col-span-7">
+                                    <div className="inline-block px-3 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase text-white mb-5" style={{ backgroundColor: themeColor }}>
                                         From
                                     </div>
-                                    <h2 className="font-bold text-[18px] text-[#111827] leading-tight mb-2">{bName}</h2>
-                                    <div className="text-[13px] text-[#4B5563] space-y-0.5">
+                                    <h2 className="font-bold text-[22px] text-[#111827] leading-tight mb-3">{bName}</h2>
+                                    <div className="text-[14px] text-[#4B5563] space-y-1 max-w-[320px]">
                                         {invoiceData.street && <p>{invoiceData.street}</p>}
                                         {(invoiceData.city || invoiceData.province || invoiceData.postalCode) && (
                                             <p>{[invoiceData.city, invoiceData.province, invoiceData.postalCode].filter(Boolean).join(', ')}</p>
                                         )}
                                         {invoiceData.country && <p>{invoiceData.country}</p>}
-                                        {displaySellerName !== bName && <p className="pt-2 font-semibold text-[#111827]">Account: {displaySellerName}</p>}
-                                        {invoiceData.registrationNumber && <p className="pt-0.5">Reg No: {invoiceData.registrationNumber}</p>}
-                                        {isVatRegistered && invoiceData.taxReferenceNumber && <p>Tax Ref: {invoiceData.taxReferenceNumber}</p>}
+                                        
+                                        <div className="pt-4 border-t border-[#F3F4F6] mt-4 space-y-1">
+                                            {displaySellerName !== bName && <p><span className="font-semibold text-[#111827]">Account:</span> {displaySellerName}</p>}
+                                            {invoiceData.sellerId && <p><span className="font-semibold text-[#111827]">Seller ID:</span> {invoiceData.sellerId}</p>}
+                                            {invoiceData.registrationNumber && <p><span className="font-semibold text-[#111827]">Reg No:</span> {invoiceData.registrationNumber}</p>}
+                                            {isVatRegistered && invoiceData.taxReferenceNumber && <p><span className="font-semibold text-[#111827]">Tax Ref:</span> {invoiceData.taxReferenceNumber}</p>}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <h1 className="text-[36px] font-[600] tracking-tight mb-4 uppercase leading-none" style={{ color: themeColor }}>
+                                
+                                <div className="col-span-5 text-right">
+                                    <h1 className="text-[42px] font-[800] tracking-tighter mb-2 uppercase leading-none" style={{ color: themeColor }}>
                                         {DocumentTitle}
                                     </h1>
-                                    <div className="space-y-1">
-                                        <p className="text-[13px] text-[#6B7280]">Invoice Number</p>
-                                        <p className="font-bold text-[15px] text-[#111827]">{invoiceData.invoiceNumber}</p>
-                                        <div className="pt-3">
-                                            <p className="text-[13px] text-[#6B7280]">Issue Date</p>
-                                            <p className="font-semibold text-[15px] text-[#111827]">{invoiceData.invoiceDate?.replace(/-/g, '/')}</p>
+                                    <p className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-widest mb-6">Stock Loss Claim Invoice</p>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest mb-1">Invoice Number</p>
+                                            <p className="font-bold text-[18px] text-[#111827]">{invoiceData.invoiceNumber}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest mb-1">Issue Date</p>
+                                            <p className="font-semibold text-[16px] text-[#111827]">{invoiceData.invoiceDate?.replace(/-/g, '/')}</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Middle Details Split */}
-                            <div className="grid grid-cols-2 gap-10 mb-16">
-                                <div>
-                                    <div className="inline-block px-3 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase text-[#4B5563] bg-[#F3F4F6] mb-4">
-                                        Bill To
+                            {/* Details Grid */}
+                            <div className="grid grid-cols-12 gap-8 mb-10 border-t border-b border-[#F3F4F6] py-8 items-start">
+                                <div className="col-span-7">
+                                    <div className="inline-block px-3 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase text-[#6B7280] bg-[#F3F4F6] mb-4">
+                                        Billed To
                                     </div>
-                                    <h3 className="font-bold text-[15px] text-[#111827] mb-2">Takealot Online (RF) (PTY) Limited</h3>
-                                    <div className="text-[13px] text-[#4B5563] space-y-0.5 leading-relaxed">
+                                    <h3 className="font-bold text-[16px] text-[#111827] mb-2">Takealot Online (RF) (PTY) Limited</h3>
+                                    <div className="text-[14px] text-[#4B5563] space-y-1 leading-relaxed max-w-[320px]">
                                         <p>12th Floor, 10 Rua Vasco Da Gama Plain</p>
                                         <p>Foreshore, Cape Town - 8000</p>
-                                        <div className="pt-2">
-                                            <p><span className="font-semibold">VAT:</span> 4480252119</p>
-                                            <p><span className="font-semibold">Reg:</span> 2010/020248/07</p>
+                                        <div className="pt-3 space-y-1">
+                                            <div className="flex space-x-4">
+                                                <p><span className="font-semibold text-[#111827]">VAT:</span> 4480252119</p>
+                                                <p><span className="font-semibold text-[#111827]">Reg:</span> 2010/020248/07</p>
+                                            </div>
+                                            <p><span className="font-semibold text-[#111827]">Tax Ref:</span> 9910006148</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div>
-                                    <div className="inline-block px-3 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase text-[#4B5563] bg-[#F3F4F6] mb-4">
-                                        Payment Terms
+                                
+                                <div className="col-span-5 text-right flex flex-col justify-start items-end">
+                                    <div className="inline-block px-3 py-1 rounded-md text-[10px] font-bold tracking-widest uppercase text-[#6B7280] bg-[#F3F4F6] mb-4">
+                                        Report Metadata
                                     </div>
-                                    <div className="text-[13px] text-[#4B5563]">
-                                        <p className="text-[#111827] font-semibold text-[15px] mb-1">Standard 30 Days</p>
-                                        <p>Payment will be processed via Takealot Seller Portal.</p>
+                                    <div className="text-[14px] text-[#4B5563] space-y-2">
+                                        <p><span className="font-semibold text-[#111827]">Recon Period:</span> {periodMatch}</p>
+                                        <p className="text-[12px] italic text-[#9CA3AF]">Source: {filename}</p>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Table */}
-                            <div className="mb-10 overflow-hidden rounded-xl border border-[#F3F4F6]">
+                            {/* Table Section */}
+                            <div className="mb-8 border border-[#F3F4F6] rounded-2xl overflow-hidden">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b-2" style={{ borderBottomColor: themeColor }}>
-                                            <th className="py-4 px-5 font-bold text-[11px] uppercase tracking-wider text-[#6B7280] bg-[#F9FAFB]">Item Description</th>
-                                            <th className="py-4 px-5 font-bold text-[11px] uppercase tracking-wider text-[#6B7280] bg-[#F9FAFB] text-center">Qty</th>
-                                            <th className="py-4 px-5 font-bold text-[11px] uppercase tracking-wider text-[#6B7280] bg-[#F9FAFB] text-right">Rate</th>
-                                            <th className="py-4 px-5 font-bold text-[11px] uppercase tracking-wider text-[#6B7280] bg-[#F9FAFB] text-right">VAT (15%)</th>
-                                            <th className="py-4 px-5 font-bold text-[11px] uppercase tracking-wider text-[#6B7280] bg-[#F9FAFB] text-right">Total</th>
+                                        <tr className="bg-white border-b-2" style={{ borderBottomColor: themeColor }}>
+                                            <th className="py-4 px-8 font-bold text-[11px] uppercase tracking-widest text-[#9CA3AF] w-[38%]">Item Description</th>
+                                            <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-widest text-[#9CA3AF] text-center w-[8%]">Qty</th>
+                                            <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-widest text-[#9CA3AF] text-right w-[18%]">Unit Claim Value</th>
+                                            <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-widest text-[#9CA3AF] text-right w-[17%]">VAT (15%)</th>
+                                            <th className="py-4 px-8 font-bold text-[11px] uppercase tracking-widest text-[#9CA3AF] text-right w-[19%]">Total Claim Value</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {claimableItems.map((item, idx) => {
-                                            const itemRate = Number(item._numericClaim) || 0;
-                                            const itemVAT = isVatRegistered ? itemRate * 0.15 : 0;
-                                            const itemTotal = itemRate + itemVAT;
-
+                                            const itemQty = matchedColumns.quantity
+                                                ? Math.abs(Number(item[matchedColumns.quantity]) || 1)
+                                                : 1;
+                                            const unitRate = Number(item._numericClaim) || 0;
+                                            const itemVAT = isVatRegistered ? unitRate * 0.15 : 0;
+                                            const itemTotal = (unitRate + itemVAT) * itemQty;
+ 
                                             return (
-                                                <tr key={idx} className="border-b border-[#F3F4F6] last:border-0 hover:bg-[#FDFDFD]">
-                                                    <td className="py-5 px-5 align-top">
+                                                <tr key={idx} className="border-t border-[#F3F4F6] transition-colors hover:bg-[#F9FAFB]/50">
+                                                    <td className="py-5 px-8">
                                                         <div className="text-[14px] text-[#111827] font-bold leading-tight mb-1">
                                                             {matchedColumns.productTitle ? item[matchedColumns.productTitle] : 'Unknown Product'}
                                                         </div>
-                                                        <div className="text-[11px] text-[#9CA3AF] font-medium uppercase tracking-tighter">
-                                                            SKU: {matchedColumns.sku ? item[matchedColumns.sku] : 'N/A'} • TSIN: {matchedColumns.tsin ? item[matchedColumns.tsin] : 'N/A'}
+                                                        <div className="text-[11px] text-[#9CA3AF] font-medium tracking-tight uppercase">
+                                                            TSIN: {matchedColumns.tsin ? item[matchedColumns.tsin] : 'N/A'} • SKU: {matchedColumns.sku ? item[matchedColumns.sku] : 'N/A'}
                                                         </div>
                                                     </td>
-                                                    <td className="py-5 px-5 align-top text-center text-[14px] text-[#4B5563] font-semibold">1</td>
-                                                    <td className="py-5 px-5 align-top text-right text-[14px] text-[#4B5563] font-medium tabular-nums whitespace-nowrap">
-                                                        {formatCurrency(itemRate)}
+                                                    <td className="py-5 px-4 text-center text-[14px] text-[#4B5563] font-semibold">{itemQty}</td>
+                                                    <td className="py-5 px-4 text-right text-[14px] text-[#4B5563] tabular-nums font-medium whitespace-nowrap">
+                                                        {formatCurrency(unitRate)}
                                                     </td>
-                                                    <td className="py-5 px-5 align-top text-right text-[14px] text-[#4B5563] font-medium tabular-nums whitespace-nowrap">
-                                                        {formatCurrency(itemVAT)}
+                                                    <td className="py-5 px-4 text-right text-[14px] text-[#4B5563] tabular-nums font-medium whitespace-nowrap">
+                                                        {isVatRegistered
+                                                            ? formatCurrency(itemVAT * itemQty)
+                                                            : <span className="text-[12px] text-[#9CA3AF] italic">0% (N/A)</span>
+                                                        }
                                                     </td>
-                                                    <td className="py-5 px-5 align-top text-right text-[14px] text-[#111827] font-bold tabular-nums whitespace-nowrap">
+                                                    <td className="py-5 px-8 text-right text-[15px] text-[#111827] font-bold tabular-nums whitespace-nowrap">
                                                         {formatCurrency(itemTotal)}
                                                     </td>
                                                 </tr>
@@ -243,36 +269,46 @@ export default function InvoicePreview({ invoiceData, parsedData, matchedColumns
                                     </tbody>
                                 </table>
                             </div>
-
-                            {/* Financial Summary */}
-                            <div className="flex justify-end mb-20">
-                                <div className="w-[340px] space-y-1">
-                                    <div className="flex justify-between items-center py-2 px-2 text-[14px] text-[#6B7280]">
-                                        <span>Subtotal</span>
-                                        <span className="font-semibold text-[#111827]">{formatCurrency(subtotal)}</span>
+ 
+                            {/* Summary Section */}
+                            <div className="flex justify-end">
+                                <div className="w-[360px] space-y-3">
+                                    <div className="flex justify-between items-center text-[14px] text-[#6B7280] py-1">
+                                        <span className="font-medium">Subtotal</span>
+                                        <span className="font-semibold text-[#111827] tabular-nums">{formatCurrency(subtotal).replace('R ', 'R').replace('R', 'R ')}</span>
                                     </div>
-                                    <div className="flex justify-between items-center py-2 px-2 text-[14px] text-[#6B7280]">
-                                        <span>VAT Total</span>
-                                        <span className="font-semibold text-[#111827]">{formatCurrency(vatAmount)}</span>
+                                    <div className="flex justify-between items-center text-[14px] text-[#6B7280] py-1 border-b border-[#F3F4F6] pb-3">
+                                        <span className="font-medium">
+                                            {isVatRegistered ? 'VAT Total (15%)' : 'VAT'}
+                                        </span>
+                                        <span className="font-semibold text-[#111827] tabular-nums">
+                                            {isVatRegistered
+                                                ? formatCurrency(vatAmount)
+                                                : <span className="text-[12px] text-[#9CA3AF] italic">0% (Not applicable)</span>
+                                            }
+                                        </span>
                                     </div>
-                                    <div className="h-px bg-[#E5E7EB] my-2"></div>
-                                    <div className="flex justify-between items-center py-4 px-5 text-[18px] font-bold text-white rounded-xl shadow-lg" style={{ backgroundColor: themeColor }}>
-                                        <span>TOTAL DUE</span>
-                                        <span className="tabular-nums">{formatCurrency(total)}</span>
+                                    
+                                    <div className="pt-2">
+                                        <div 
+                                            className="flex justify-between items-center py-4 px-7 rounded-xl shadow-md text-white" 
+                                            style={{ backgroundColor: themeColor }}
+                                        >
+                                            <span className="text-[14px] font-black uppercase tracking-[0.12em]">Total Due</span>
+                                            <span className="text-[21px] font-black tabular-nums">
+                                                {formatCurrency(total).replace('R ', 'R').replace('R', 'R ')}
+                                            </span>
+                                        </div>
                                     </div>
+                                     
                                     {isVatRegistered && (
-                                        <p className="text-[10px] text-center text-[#9CA3AF] pt-2 uppercase font-bold tracking-widest">Pricing includes 15% South African VAT</p>
+                                        <p className="text-[10px] text-right text-[#9CA3AF] pt-1.5 uppercase font-bold tracking-[0.15em]">
+                                            Pricing includes 15% South African VAT
+                                        </p>
                                     )}
                                 </div>
                             </div>
-
-                            {/* Report Metadata */}
-                            <div className="border-t border-[#F3F4F6] pt-12 text-center">
-                                <h3 className="font-bold text-[14px] text-[#111827] mb-2 uppercase tracking-widest">Inventory Reconciliation Report</h3>
-                                <p className="text-[13px] text-[#6B7280]">Period: <span className="text-[#111827] font-semibold">{periodMatch}</span></p>
-                                <p className="text-[12px] text-[#9CA3AF] mt-1 italic">Generated from {filename}</p>
-                            </div>
-
+ 
                         </div>
                     </div>
                 </div>

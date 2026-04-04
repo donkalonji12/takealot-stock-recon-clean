@@ -71,15 +71,13 @@ export default function UploadArea({ onFileSelect, onUseSample, allowMultiple = 
                             className="hidden"
                         />
 
-                        {!allowMultiple && (
-                            <button
-                                onClick={onUseSample}
-                                className="bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] border border-[#d2d2d7] font-medium py-3 px-8 rounded-full transition-all duration-300 flex items-center shadow-sm active:scale-95"
-                            >
-                                <FileText size={18} className="mr-2 text-[#86868b]" />
-                                Use Sample Data
-                            </button>
-                        )}
+                        <button
+                            onClick={onUseSample}
+                            className="bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] border border-[#d2d2d7] font-medium py-3 px-8 rounded-full transition-all duration-300 flex items-center shadow-sm active:scale-95"
+                        >
+                            <FileText size={18} className="mr-2 text-[#86868b]" />
+                            Use Sample Data
+                        </button>
                     </div>
                 </div>
             </div>
