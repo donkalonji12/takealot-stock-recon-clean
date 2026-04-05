@@ -332,17 +332,17 @@ export default function App() {
                         <div className="animate-in fade-in duration-500">
  
                             {/* Mode Selector */}
-                            <div className="flex justify-center mb-10">
+                            <div className="flex justify-center mb-8 sm:mb-10">
                                 <div className="bg-[#e5e5ea] p-1.5 rounded-xl flex space-x-1 shadow-inner">
                                     <button
                                         onClick={() => { setUploadMode('single'); setParsedState(null); setErrorState(null); }}
-                                        className={`px-8 py-2.5 rounded-lg font-semibold text-[14px] flex items-center transition-all duration-300 ${uploadMode === 'single' ? 'bg-white text-[#1d1d1f] shadow-sm' : 'text-[#6e6e73] hover:text-[#1d1d1f]'}`}
+                                        className={`px-4 sm:px-8 py-3 rounded-lg font-semibold text-[14px] flex items-center transition-all duration-300 ${uploadMode === 'single' ? 'bg-white text-[#1d1d1f] shadow-sm' : 'text-[#6e6e73] hover:text-[#1d1d1f]'}`}
                                     >
                                         <FileDigit size={18} className="mr-2" /> Single File
                                     </button>
                                     <button
                                         onClick={() => { setUploadMode('bulk'); setParsedState(null); setErrorState(null); }}
-                                        className={`px-8 py-2.5 rounded-lg font-semibold text-[14px] flex items-center transition-all duration-300 ${uploadMode === 'bulk' ? 'bg-white text-[#1d1d1f] shadow-sm' : 'text-[#6e6e73] hover:text-[#1d1d1f]'}`}
+                                        className={`px-4 sm:px-8 py-3 rounded-lg font-semibold text-[14px] flex items-center transition-all duration-300 ${uploadMode === 'bulk' ? 'bg-white text-[#1d1d1f] shadow-sm' : 'text-[#6e6e73] hover:text-[#1d1d1f]'}`}
                                     >
                                         <Layers size={18} className="mr-2" /> Bulk Scanner
                                     </button>
@@ -426,10 +426,10 @@ export default function App() {
  
                                     <DataTablePreview data={parsedState.data} headers={parsedState.headers || []} matchedColumns={parsedState.matchedColumns} />
  
-                                    <div className="mt-8 mb-16 flex justify-end animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                    <div className="mt-8 mb-12 sm:mb-16 flex justify-center sm:justify-end animate-in fade-in slide-in-from-bottom-4 duration-700">
                                         <button
                                             onClick={() => setCurrentStep(2)}
-                                            className="bg-[#4f86f7] hover:bg-[#3b6bd6] text-white font-medium py-4 px-10 rounded-full shadow-[0_8px_24px_rgba(79,134,247,0.3)] transition-all duration-300 active:scale-95 flex items-center group"
+                                            className="w-full sm:w-auto bg-[#4f86f7] hover:bg-[#3b6bd6] text-white font-medium py-4 px-10 rounded-full shadow-[0_8px_24px_rgba(79,134,247,0.3)] transition-all duration-300 active:scale-95 flex items-center justify-center group"
                                         >
                                             <span className="text-[15px]">Continue to Edit Invoice</span>
                                             <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>

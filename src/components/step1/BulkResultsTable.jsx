@@ -229,94 +229,151 @@ export default function BulkResultsTable({ batches = [], onStartClaim, onDeleteR
                 {view === 'history' && !selectedBatchId ? (
                     <div className="divide-y divide-[#f5f5f7]">
                         {batches.map((batch) => (
-                            <div key={batch.id} className="px-8 py-6 hover:bg-[#fbfbfd] transition-all flex items-center justify-between group">
-                                <div className="flex items-center space-x-5">
-                                    <div className="w-12 h-12 rounded-2xl bg-[#f5f5f7] flex items-center justify-center text-[#4f86f7]"><FolderOpen size={24} /></div>
+                            <div key={batch.id} className="px-5 sm:px-8 py-5 sm:py-6 hover:bg-[#fbfbfd] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-11 h-11 rounded-2xl bg-[#f5f5f7] flex items-center justify-center text-[#4f86f7] shrink-0"><FolderOpen size={22} /></div>
                                     <div>
                                         <div className="flex items-center space-x-3 mb-0.5"><h4 className="text-[15px] font-semibold text-[#1d1d1f]">{formatDate(batch.createdAt)}</h4></div>
-                                        <div className="flex items-center space-x-4 text-[12px] text-[#6e6e73] font-medium">
+                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[#6e6e73] font-medium">
                                             <span>{batch.stats?.total} files</span>
                                             <span className="text-[#34c759]">{batch.stats?.claimable} claimable</span>
                                             <span className="font-bold text-[#1d1d1f]">{formatCurrency(batch.stats?.totalValue)}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    <button onClick={() => onDeleteBatch(batch.id)} className="p-2 text-[#86868b] hover:text-[#ff3b30] rounded-full transition-all opacity-0 group-hover:opacity-100"><Trash2 size={18} /></button>
-                                    <button onClick={() => setSelectedBatchId(batch.id)} className="bg-[#f5f5f7] hover:bg-[#e5e5ea] text-[#1d1d1f] px-5 py-2 rounded-xl font-bold text-[12px] transition-all flex items-center shadow-sm">Open <span>&rarr;</span></button>
+                                <div className="flex items-center gap-2 self-end sm:self-auto">
+                                    <button onClick={() => onDeleteBatch(batch.id)} className="p-2 text-[#86868b] hover:text-[#ff3b30] rounded-full transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"><Trash2 size={18} /></button>
+                                    <button onClick={() => setSelectedBatchId(batch.id)} className="bg-[#f5f5f7] hover:bg-[#e5e5ea] text-[#1d1d1f] px-5 py-2.5 rounded-xl font-bold text-[12px] transition-all flex items-center shadow-sm min-h-[44px]">Open <span>&rarr;</span></button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse min-w-[1180px]">
-                            <thead>
-                                <tr className="bg-[#fcfcfd] border-b border-[#e5e5ea]">
-                                    <th className="py-5 px-6 text-sm font-medium text-gray-500">File Name</th>
-                                    <th className="py-5 px-4 text-sm font-medium text-gray-500">Recon Period</th>
-                                    <th className="py-5 px-4 text-sm font-medium text-gray-500 text-right">Claim Value</th>
-                                    <th className="py-5 px-4 text-sm font-medium text-gray-500 text-center">Mths Late</th>
-                                    <th className="py-5 px-4 text-sm font-medium text-gray-500 text-right">Est. Fee</th>
-                                    <th className="py-5 px-4 text-sm font-medium text-gray-500 text-right">Net Claim</th>
-                                    <th className="py-5 px-4 text-sm font-medium text-gray-500 text-center">Recommendation</th>
-                                    <th className="py-5 px-4 text-sm font-medium text-gray-500 text-center">Status</th>
-                                    <th className="py-5 px-6 text-sm font-medium text-gray-500 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {displayData.records.length === 0 ? (
-                                    <tr><td colSpan="9" className="py-20 text-center text-[#86868b] font-medium">No records found matching filters.</td></tr>
-                                ) : displayData.records.map((r) => {
-                                    const isClaimable = r.status === 'Claimable' && (r.stats?.totalClaimValue || 0) > 0;
-                                    const avail = isClaimable ? estimateReportAvailabilityDate(r.reconPeriod) : null;
-                                    const fd = isClaimable ? calculateLateFee(avail, r.stats.totalClaimValue) : null;
-                                    const recMeta = fd ? RECOMMENDATION_META[fd.recommendation] : null;
-                                    const netColor = !fd ? '' : fd.netClaimValue <= 0 ? 'text-[#dc2626]' : fd.netClaimValue < 500 ? 'text-[#d97706]' : 'text-[#16a34a]';
-                                    return (
-                                        <tr key={r.id} className="border-b border-[#f5f5f7] hover:bg-[#fbfbfd] transition-all last:border-b-0 group">
-                                            <td className="py-5 px-6 font-semibold text-[#1d1d1f] max-w-[180px] truncate">{r.filename}</td>
-                                            <td className="py-5 px-4 font-medium text-[#4b5563] whitespace-nowrap">{formatReconPeriod(r.reconPeriod)}</td>
-                                            <td className="py-5 px-4 text-right font-bold text-[#1d1d1f] whitespace-nowrap">{r.stats?.totalClaimValue > 0 ? formatCurrency(r.stats.totalClaimValue) : '—'}</td>
-                                            <td className="py-5 px-4 text-center">
-                                                {fd ? (
-                                                    <span className={`text-[13px] font-bold ${fd.monthsLate > 0 ? 'text-[#d97706]' : 'text-[#16a34a]'}`}>
-                                                        {fd.monthsLate > 0 ? fd.monthsLate : '—'}
-                                                    </span>
-                                                ) : <span className="text-[#d1d5db]">—</span>}
-                                            </td>
-                                            <td className="py-5 px-4 text-right whitespace-nowrap">
-                                                {fd ? (
-                                                    <span className={`text-[13px] font-semibold ${fd.totalFee > 0 ? 'text-[#d97706]' : 'text-[#6b7280]'}`}>
-                                                        {fd.totalFee > 0 ? formatCurrency(fd.totalFee) : 'None'}
-                                                    </span>
-                                                ) : <span className="text-[#d1d5db]">—</span>}
-                                            </td>
-                                            <td className={`py-5 px-4 text-right font-bold whitespace-nowrap ${netColor}`}>
-                                                {fd ? formatCurrency(fd.netClaimValue) : '—'}
-                                            </td>
-                                            <td className="py-5 px-4 text-center">
+                    <>
+                        {/* ── Mobile card view (< md) ── */}
+                        <div className="md:hidden divide-y divide-[#f5f5f7]">
+                            {displayData.records.length === 0 ? (
+                                <div className="py-16 text-center text-[#86868b] font-medium">No records found matching filters.</div>
+                            ) : displayData.records.map((r) => {
+                                const isClaimable = r.status === 'Claimable' && (r.stats?.totalClaimValue || 0) > 0;
+                                const avail = isClaimable ? estimateReportAvailabilityDate(r.reconPeriod) : null;
+                                const fd = isClaimable ? calculateLateFee(avail, r.stats.totalClaimValue) : null;
+                                const recMeta = fd ? RECOMMENDATION_META[fd.recommendation] : null;
+                                const netColor = !fd ? 'text-[#1d1d1f]' : fd.netClaimValue <= 0 ? 'text-[#dc2626]' : fd.netClaimValue < 500 ? 'text-[#d97706]' : 'text-[#16a34a]';
+                                return (
+                                    <div key={r.id} className="px-5 py-4 space-y-3">
+                                        {/* Row 1: filename + status */}
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="min-w-0">
+                                                <p className="font-semibold text-[14px] text-[#1d1d1f] truncate">{r.filename}</p>
+                                                <p className="text-[12px] text-[#6e6e73] mt-0.5">{formatReconPeriod(r.reconPeriod)}</p>
+                                            </div>
+                                            <span className={`inline-block shrink-0 px-3 py-1 text-[10px] font-bold rounded-full border tracking-wide uppercase ${getStatusStyle(r.status)}`}>{r.status}</span>
+                                        </div>
+                                        {/* Row 2: key metrics */}
+                                        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                            <div>
+                                                <p className="text-[11px] text-[#86868b] font-bold uppercase tracking-wide">Claim Value</p>
+                                                <p className="text-[14px] font-bold text-[#1d1d1f]">{r.stats?.totalClaimValue > 0 ? formatCurrency(r.stats.totalClaimValue) : '—'}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[11px] text-[#86868b] font-bold uppercase tracking-wide">Net Claim</p>
+                                                <p className={`text-[14px] font-bold ${netColor}`}>{fd ? formatCurrency(fd.netClaimValue) : '—'}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[11px] text-[#86868b] font-bold uppercase tracking-wide">Months Late</p>
+                                                <p className={`text-[14px] font-bold ${fd && fd.monthsLate > 0 ? 'text-[#d97706]' : 'text-[#6b7280]'}`}>{fd ? (fd.monthsLate > 0 ? fd.monthsLate : '—') : '—'}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-[11px] text-[#86868b] font-bold uppercase tracking-wide">Recommendation</p>
                                                 {recMeta ? (
-                                                    <span className={`inline-block px-3 py-1 text-[10px] font-bold rounded-full border tracking-wide ${recMeta.bg} ${recMeta.color}`}>
-                                                        {recMeta.short}
-                                                    </span>
-                                                ) : <span className="text-[#d1d5db]">—</span>}
-                                            </td>
-                                            <td className="py-5 px-4 text-center"><span className={`inline-block px-3 py-1.5 text-[10px] font-bold rounded-full border tracking-wide uppercase ${getStatusStyle(r.status)}`}>{r.status}</span></td>
-                                            <td className="py-5 px-6 text-right whitespace-nowrap">
-                                                <div className="flex justify-end items-center space-x-2">
-                                                    <button onClick={() => onDeleteRecord(r.id, r.batchId)} className="p-2 text-[#86868b] hover:text-[#ff3b30] opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={18} /></button>
-                                                    <button onClick={() => onStartClaim(r)} disabled={r.status !== 'Claimable'} className={`px-4 py-2 font-bold text-[12px] rounded-full transition-all ${r.status === 'Claimable' ? 'bg-[#4f86f7] text-white hover:bg-blue-600 shadow-sm' : 'bg-[#f5f5f7] text-[#a1a1a6] border border-[#e5e5ea] cursor-not-allowed'}`}>Claim &rarr;</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
+                                                    <span className={`inline-block mt-0.5 px-2.5 py-1 text-[10px] font-bold rounded-full border ${recMeta.bg} ${recMeta.color}`}>{recMeta.short}</span>
+                                                ) : <span className="text-[#d1d5db] text-[13px]">—</span>}
+                                            </div>
+                                        </div>
+                                        {/* Row 3: actions */}
+                                        <div className="flex items-center gap-2 pt-1">
+                                            <button onClick={() => onDeleteRecord(r.id, r.batchId)} className="p-2.5 text-[#86868b] hover:text-[#ff3b30] transition-all rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center border border-[#f0f0f0]"><Trash2 size={16} /></button>
+                                            <button onClick={() => onStartClaim(r)} disabled={r.status !== 'Claimable'} className={`flex-1 py-3 font-bold text-[13px] rounded-full transition-all min-h-[44px] ${r.status === 'Claimable' ? 'bg-[#4f86f7] text-white hover:bg-blue-600 shadow-sm' : 'bg-[#f5f5f7] text-[#a1a1a6] border border-[#e5e5ea] cursor-not-allowed'}`}>
+                                                {r.status === 'Claimable' ? 'Start Claim →' : 'Not Claimable'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* ── Desktop table view (md+) ── */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full text-left border-collapse min-w-[1180px]">
+                                <thead>
+                                    <tr className="bg-[#fcfcfd] border-b border-[#e5e5ea]">
+                                        <th className="py-5 px-6 text-sm font-medium text-gray-500">File Name</th>
+                                        <th className="py-5 px-4 text-sm font-medium text-gray-500">Recon Period</th>
+                                        <th className="py-5 px-4 text-sm font-medium text-gray-500 text-right">Claim Value</th>
+                                        <th className="py-5 px-4 text-sm font-medium text-gray-500 text-center">Mths Late</th>
+                                        <th className="py-5 px-4 text-sm font-medium text-gray-500 text-right">Est. Fee</th>
+                                        <th className="py-5 px-4 text-sm font-medium text-gray-500 text-right">Net Claim</th>
+                                        <th className="py-5 px-4 text-sm font-medium text-gray-500 text-center">Recommendation</th>
+                                        <th className="py-5 px-4 text-sm font-medium text-gray-500 text-center">Status</th>
+                                        <th className="py-5 px-6 text-sm font-medium text-gray-500 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {displayData.records.length === 0 ? (
+                                        <tr><td colSpan="9" className="py-20 text-center text-[#86868b] font-medium">No records found matching filters.</td></tr>
+                                    ) : displayData.records.map((r) => {
+                                        const isClaimable = r.status === 'Claimable' && (r.stats?.totalClaimValue || 0) > 0;
+                                        const avail = isClaimable ? estimateReportAvailabilityDate(r.reconPeriod) : null;
+                                        const fd = isClaimable ? calculateLateFee(avail, r.stats.totalClaimValue) : null;
+                                        const recMeta = fd ? RECOMMENDATION_META[fd.recommendation] : null;
+                                        const netColor = !fd ? '' : fd.netClaimValue <= 0 ? 'text-[#dc2626]' : fd.netClaimValue < 500 ? 'text-[#d97706]' : 'text-[#16a34a]';
+                                        return (
+                                            <tr key={r.id} className="border-b border-[#f5f5f7] hover:bg-[#fbfbfd] transition-all last:border-b-0 group">
+                                                <td className="py-5 px-6 font-semibold text-[#1d1d1f] max-w-[180px] truncate">{r.filename}</td>
+                                                <td className="py-5 px-4 font-medium text-[#4b5563] whitespace-nowrap">{formatReconPeriod(r.reconPeriod)}</td>
+                                                <td className="py-5 px-4 text-right font-bold text-[#1d1d1f] whitespace-nowrap">{r.stats?.totalClaimValue > 0 ? formatCurrency(r.stats.totalClaimValue) : '—'}</td>
+                                                <td className="py-5 px-4 text-center">
+                                                    {fd ? (
+                                                        <span className={`text-[13px] font-bold ${fd.monthsLate > 0 ? 'text-[#d97706]' : 'text-[#16a34a]'}`}>
+                                                            {fd.monthsLate > 0 ? fd.monthsLate : '—'}
+                                                        </span>
+                                                    ) : <span className="text-[#d1d5db]">—</span>}
+                                                </td>
+                                                <td className="py-5 px-4 text-right whitespace-nowrap">
+                                                    {fd ? (
+                                                        <span className={`text-[13px] font-semibold ${fd.totalFee > 0 ? 'text-[#d97706]' : 'text-[#6b7280]'}`}>
+                                                            {fd.totalFee > 0 ? formatCurrency(fd.totalFee) : 'None'}
+                                                        </span>
+                                                    ) : <span className="text-[#d1d5db]">—</span>}
+                                                </td>
+                                                <td className={`py-5 px-4 text-right font-bold whitespace-nowrap ${netColor}`}>
+                                                    {fd ? formatCurrency(fd.netClaimValue) : '—'}
+                                                </td>
+                                                <td className="py-5 px-4 text-center">
+                                                    {recMeta ? (
+                                                        <span className={`inline-block px-3 py-1 text-[10px] font-bold rounded-full border tracking-wide ${recMeta.bg} ${recMeta.color}`}>
+                                                            {recMeta.short}
+                                                        </span>
+                                                    ) : <span className="text-[#d1d5db]">—</span>}
+                                                </td>
+                                                <td className="py-5 px-4 text-center"><span className={`inline-block px-3 py-1.5 text-[10px] font-bold rounded-full border tracking-wide uppercase ${getStatusStyle(r.status)}`}>{r.status}</span></td>
+                                                <td className="py-5 px-6 text-right whitespace-nowrap">
+                                                    <div className="flex justify-end items-center space-x-2">
+                                                        <button onClick={() => onDeleteRecord(r.id, r.batchId)} className="p-2 text-[#86868b] hover:text-[#ff3b30] opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={18} /></button>
+                                                        <button onClick={() => onStartClaim(r)} disabled={r.status !== 'Claimable'} className={`px-4 py-2 font-bold text-[12px] rounded-full transition-all ${r.status === 'Claimable' ? 'bg-[#4f86f7] text-white hover:bg-blue-600 shadow-sm' : 'bg-[#f5f5f7] text-[#a1a1a6] border border-[#e5e5ea] cursor-not-allowed'}`}>Claim &rarr;</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
                 )}
             </div>
         </div>
     );
 }
+

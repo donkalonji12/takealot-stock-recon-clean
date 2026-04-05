@@ -88,21 +88,21 @@ export default function InvoicePreview({ invoiceData, parsedData, matchedColumns
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto pb-20">
 
             {/* Navigation Bar */}
-            <div className="flex items-center justify-between mb-6 bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-sm">
-                <button onClick={onBack} className="text-[#4B5563] hover:text-[#111827] flex items-center font-medium transition-colors px-4 py-2 rounded-lg hover:bg-[#F9FAFB]">
+            <div className="flex flex-wrap items-center gap-3 mb-6 bg-white p-4 rounded-2xl border border-[#E5E7EB] shadow-sm">
+                <button onClick={onBack} className="text-[#4B5563] hover:text-[#111827] flex items-center font-medium transition-colors px-4 py-2.5 rounded-lg hover:bg-[#F9FAFB] min-h-[44px]">
                     <ArrowLeft size={18} className="mr-2" /> Back
                 </button>
 
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-wrap">
                     <button
                         onClick={handleDownloadPDF}
                         disabled={isGenerating}
-                        className={`flex items-center font-semibold px-5 py-2.5 rounded-xl border border-[#D1D5DB] transition-all hover:bg-[#F9FAFB] text-[#1F2937] ${isGenerating ? 'opacity-50' : ''}`}
+                        className={`flex items-center font-semibold px-4 sm:px-5 py-2.5 rounded-xl border border-[#D1D5DB] transition-all hover:bg-[#F9FAFB] text-[#1F2937] min-h-[44px] ${isGenerating ? 'opacity-50' : ''}`}
                     >
                         <Download size={18} className="mr-2" /> {isGenerating ? 'Saving...' : 'Download PDF'}
                     </button>
 
-                    <button onClick={onContinue} className="text-white flex items-center font-bold transition-all px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg active:scale-95" style={{ backgroundColor: themeColor }}>
+                    <button onClick={onContinue} className="text-white flex items-center font-bold transition-all px-5 sm:px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg active:scale-95 min-h-[44px]" style={{ backgroundColor: themeColor }}>
                         Finish & Continue <ArrowRight size={18} className="ml-2" />
                     </button>
                 </div>
@@ -142,6 +142,13 @@ export default function InvoicePreview({ invoiceData, parsedData, matchedColumns
                 <div className="flex justify-between items-center px-4">
                     <h3 className="text-[11px] font-bold text-[#6B7280] uppercase tracking-widest">Document Preview</h3>
                     <span className="text-[11px] font-medium text-[#9CA3AF]">A4 Standard Layout</span>
+                </div>
+
+                {/* Mobile scroll hint */}
+                <div className="sm:hidden flex items-center justify-center gap-2 py-2 text-[12px] text-[#86868b] font-medium">
+                    <span>←</span>
+                    <span>Scroll to view full invoice</span>
+                    <span>→</span>
                 </div>
 
                 <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-[0_10px_40px_rgba(0,0,0,0.04)] overflow-hidden relative">

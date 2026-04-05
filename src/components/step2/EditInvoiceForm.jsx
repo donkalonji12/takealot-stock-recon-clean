@@ -47,12 +47,12 @@ export default function EditInvoiceForm({ data, onChange, onContinue, onBack }) 
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-[#e5e5ea] overflow-hidden mb-8">
-                <div className="px-10 py-8 border-b border-[#e5e5ea] bg-white">
-                    <h2 className="text-xl font-semibold text-[#1d1d1f] tracking-tight">Edit Invoice Details</h2>
+                <div className="px-5 py-6 sm:px-10 sm:py-8 border-b border-[#e5e5ea] bg-white">
+                    <h2 className="text-lg sm:text-xl font-semibold text-[#1d1d1f] tracking-tight">Edit Invoice Details</h2>
                     <p className="text-sm text-[#6e6e73] mt-1">Provide your business and invoice information for the generated claim.</p>
                 </div>
 
-                <div className="p-10">
+                <div className="p-5 sm:p-10">
                     {/* Section A: Business Details */}
                     <div className="mb-12">
                         <h3 className="text-[15px] font-semibold text-[#1d1d1f] mb-6 border-b border-[#e5e5ea] pb-2">Business Details</h3>
@@ -65,8 +65,8 @@ export default function EditInvoiceForm({ data, onChange, onContinue, onBack }) 
 
                             <div className="mb-6">
                                 <label className="block text-[13px] font-semibold text-[#6e6e73] tracking-wide mb-2 uppercase">VAT Status</label>
-                                <div className="flex space-x-6 mt-3">
-                                    <label className="flex items-center space-x-3 cursor-pointer group">
+                                <div className="flex flex-wrap gap-4 mt-3">
+                                    <label className="flex items-center space-x-3 cursor-pointer group min-h-[44px]">
                                         <input
                                             type="radio"
                                             name="vatStatus"
@@ -77,7 +77,7 @@ export default function EditInvoiceForm({ data, onChange, onContinue, onBack }) 
                                         />
                                         <span className="text-sm font-medium text-[#1d1d1f] group-hover:text-[#4f86f7] transition-colors">VAT Registered</span>
                                     </label>
-                                    <label className="flex items-center space-x-3 cursor-pointer group">
+                                    <label className="flex items-center space-x-3 cursor-pointer group min-h-[44px]">
                                         <input
                                             type="radio"
                                             name="vatStatus"
@@ -142,16 +142,16 @@ export default function EditInvoiceForm({ data, onChange, onContinue, onBack }) 
                 </div>
             </div>
 
-            <div className="flex items-center justify-between pb-10">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between pb-10 gap-3 sm:gap-0">
                 <button
                     onClick={onBack}
-                    className="bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] border border-[#d2d2d7] font-medium py-3.5 px-8 rounded-full transition-all duration-300 shadow-sm active:scale-95"
+                    className="bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] border border-[#d2d2d7] font-medium py-4 px-8 rounded-full transition-all duration-300 shadow-sm active:scale-95 w-full sm:w-auto text-center"
                 >
                     Back to Upload
                 </button>
                 <button
                     onClick={handleContinue}
-                    className="bg-[#4f86f7] hover:bg-[#3b6bd6] text-white font-medium py-3.5 px-10 rounded-full shadow-[0_4px_16px_rgba(79,134,247,0.3)] transition-all duration-300 active:scale-95"
+                    className="bg-[#4f86f7] hover:bg-[#3b6bd6] text-white font-medium py-4 px-10 rounded-full shadow-[0_4px_16px_rgba(79,134,247,0.3)] transition-all duration-300 active:scale-95 w-full sm:w-auto text-center"
                 >
                     Continue to Preview
                 </button>

@@ -66,20 +66,20 @@ ${invoiceData.businessName || 'Seller'}`;
                 <div className="space-y-10">
                     {/* Copy Area */}
                     <div className="bg-white rounded-[24px] shadow-sm border border-[#E5E7EB] overflow-hidden">
-                        <div className="px-10 py-8 border-b border-[#E5E7EB] bg-white flex justify-between items-center">
+                        <div className="px-5 py-6 sm:px-10 sm:py-8 border-b border-[#E5E7EB] bg-white flex flex-wrap gap-4 items-start justify-between">
                             <div>
                                 <h3 className="text-[18px] font-bold text-[#111827] mb-1">Message Template</h3>
                                 <p className="text-[13px] text-[#6B7280] font-medium">Use this professional template for your ticket body.</p>
                             </div>
                             <button 
                                 onClick={() => { copyToClipboard(`Subject: ${subjectText}\n\nMessage:\n${messageText}`, 'all') }}
-                                className="text-[13px] font-bold text-[#2563EB] bg-[#EFF6FF] hover:bg-[#DBEAFE] px-5 py-2 rounded-full transition-colors flex items-center"
+                                className="text-[13px] font-bold text-[#2563EB] bg-[#EFF6FF] hover:bg-[#DBEAFE] px-5 py-3 rounded-full transition-colors flex items-center min-h-[44px]"
                             >
                                 {copiedStates.all ? <Check size={16} className="mr-2" /> : <Copy size={16} className="mr-2" />}
                                 {copiedStates.all ? 'Copied Everything' : 'Copy All'}
                             </button>
                         </div>
-                        <div className="p-10 space-y-8">
+                        <div className="p-5 sm:p-10 space-y-8">
                             <div>
                                 <div className="flex justify-between items-center mb-3">
                                     <label className="text-[11px] font-bold text-[#6B7280] uppercase tracking-widest">Subject Line</label>
@@ -107,20 +107,20 @@ ${invoiceData.businessName || 'Seller'}`;
                     </div>
 
                     {/* Support Link */}
-                    <div className="bg-[#EFF6FF] border border-[#DBEAFE] rounded-[24px] p-8 flex items-start">
-                        <div className="bg-white p-3 rounded-xl shadow-sm mr-6">
+                    <div className="bg-[#EFF6FF] border border-[#DBEAFE] rounded-[24px] p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4 sm:gap-0">
+                        <div className="bg-white p-3 rounded-xl shadow-sm sm:mr-6 shrink-0">
                             <ExternalLink className="text-[#2563EB]" size={20} />
                         </div>
                         <div>
                             <h4 className="text-[16px] font-bold text-[#111827] mb-1">Submit to Support Portal</h4>
-                            <p className="text-[13px] text-[#2563EB] font-medium leading-relaxed mb-6">
+                            <p className="text-[13px] text-[#2563EB] font-medium leading-relaxed mb-5">
                                 Please attach your downloaded PDF invoice and the original reconciliation report to your ticket.
                             </p>
                             <a 
                                 href="https://help.takealot.com/hc/en-us/requests/new?ticket_form_id=316708&&tf_34289967=internal_department_marketplace&&tf_24926807=merchant_queries" 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="bg-[#2563EB] hover:bg-[#1d4ed8] text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all inline-flex items-center active:scale-95"
+                                className="bg-[#2563EB] hover:bg-[#1d4ed8] text-white font-bold py-3.5 px-8 rounded-full shadow-lg transition-all inline-flex items-center active:scale-95 w-full sm:w-auto justify-center"
                             >
                                 Open Support Ticket <ExternalLink size={16} className="ml-2" />
                             </a>
