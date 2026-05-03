@@ -97,7 +97,22 @@ export default function EditInvoiceForm({ data, onChange, onContinue, onBack }) 
                         </div>
                     </div>
 
-                    {/* Section B: Invoice Details */}
+                    {/* Section B: Takealot Details */}
+                    <div className="mb-12 p-6 rounded-2xl border-2 border-[#4f86f7]/10 bg-[#f0f4ff]/20">
+                        <h3 className="text-[15px] font-semibold text-[#4f86f7] mb-6 border-b border-[#4f86f7]/20 pb-2 flex items-center justify-between">
+                            Takealot Billing Details
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#4f86f7]/60">Recipent</span>
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                            <InputField label="Takealot VAT Number" name="takealotVatNumber" value={data.takealotVatNumber} onChange={handleInputChange} />
+                            <InputField label="Takealot Registration Number" name="takealotRegNumber" value={data.takealotRegNumber} onChange={handleInputChange} />
+                        </div>
+                        <div className="mt-4">
+                            <InputField label="Takealot Physical Address" name="takealotAddress" placeholder="e.g. 12th Floor, 10 Rua Vasco Da Gama Plain, Foreshore, Cape Town - 8000" value={data.takealotAddress} onChange={handleInputChange} />
+                        </div>
+                    </div>
+
+                    {/* Section C: Invoice Details */}
                     <div className="mb-12">
                         <h3 className="text-[15px] font-semibold text-[#1d1d1f] mb-6 border-b border-[#e5e5ea] pb-2">Invoice Configuration</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">

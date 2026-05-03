@@ -28,7 +28,7 @@ export default function SummaryCards({ stats }) {
                         <div className="bg-gradient-to-b from-[#f8faff] to-white rounded-3xl shadow-md border border-[#cbe0ff] p-8 flex flex-col justify-center transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 relative overflow-hidden group">
                             <div className="absolute top-0 left-0 w-full h-1.5 bg-[#4f86f7] opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <h3 className="text-sm font-semibold text-[#4f86f7] mb-2 uppercase tracking-wider">Total Claim Value</h3>
-                            <p className="text-[2.75rem] leading-none font-bold tracking-tight text-[#1d1d1f] mb-1.5">{formatCurrency(val)}</p>
+                            <p className="text-[2.75rem] leading-none font-semibold tracking-tight text-[#1d1d1f] mb-1.5">{formatCurrency(val)}</p>
                             <p className="text-[13px] font-medium text-[#4f86f7]/90">Amount available to claim</p>
                         </div>
                     );
@@ -46,7 +46,7 @@ export default function SummaryCards({ stats }) {
                         <div className="bg-gradient-to-b from-[#fff5f5] to-white rounded-3xl shadow-sm border border-[#ffcccc] p-8 flex flex-col justify-center transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden group">
                             <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ff3b30] opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
                             <h3 className="text-sm font-semibold text-[#ff3b30] mb-2 uppercase tracking-wider">Total Claim Value</h3>
-                            <p className="text-[2.75rem] leading-none font-bold tracking-tight text-[#1d1d1f] mb-1.5">{formatCurrency(val)}</p>
+                            <p className="text-[2.75rem] leading-none font-semibold tracking-tight text-[#1d1d1f] mb-1.5">{formatCurrency(val)}</p>
                             <p className="text-[13px] font-medium text-[#ff3b30]/90">Negative claim balance warning</p>
                         </div>
                     );

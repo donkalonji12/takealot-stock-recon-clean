@@ -30,8 +30,8 @@ function MetricCard({ label, value, subtext, tone }) {
     };
     return (
         <div className={`rounded-2xl border px-5 py-4 flex flex-col justify-between ${tones[tone] || tones.neutral}`}>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-[#86868b] mb-2 leading-tight">{label}</p>
-            <p className="text-[19px] font-bold tracking-tight leading-snug">{value}</p>
+            <p className="text-[11px] font-medium uppercase tracking-widest text-[#86868b] mb-2 leading-tight">{label}</p>
+            <p className="text-[19px] font-semibold tracking-tight leading-snug">{value}</p>
             {subtext && <p className="text-[11px] mt-1.5 opacity-60 font-medium">{subtext}</p>}
         </div>
     );
@@ -39,9 +39,9 @@ function MetricCard({ label, value, subtext, tone }) {
 
 function CalcRow({ label, value, highlight }) {
     return (
-        <div className={`flex items-center justify-between py-2.5 border-b border-[#f3f4f6] last:border-0 ${highlight ? 'font-bold' : ''}`}>
-            <span className={`text-[13px] ${highlight ? 'text-[#1d1d1f] font-bold' : 'text-[#4b5563] font-medium'}`}>{label}</span>
-            <span className={`text-[13px] tabular-nums ${highlight ? 'text-[#1d1d1f] font-bold' : 'text-[#374151] font-semibold'}`}>{value}</span>
+        <div className={`flex items-center justify-between py-2.5 border-b border-[#f3f4f6] last:border-0 ${highlight ? 'font-semibold' : ''}`}>
+            <span className={`text-[13px] ${highlight ? 'text-[#1d1d1f] font-semibold' : 'text-[#4b5563] font-medium'}`}>{label}</span>
+            <span className={`text-[13px] tabular-nums ${highlight ? 'text-[#1d1d1f] font-semibold' : 'text-[#374151] font-semibold'}`}>{value}</span>
         </div>
     );
 }
@@ -101,7 +101,7 @@ export default function LateFeeEstimator({ parsedData, matchedColumns, stats }) 
                         <Clock size={20} className="text-[#f59e0b]" />
                     </div>
                     <div>
-                        <h3 className="text-[15px] font-bold text-[#1d1d1f] tracking-tight mb-1">
+                        <h3 className="text-[15px] font-semibold text-[#1d1d1f] tracking-tight mb-1">
                             Late Fee Estimator
                         </h3>
                         <p className="text-[13px] text-[#6e6e73] max-w-[500px]">
@@ -113,7 +113,7 @@ export default function LateFeeEstimator({ parsedData, matchedColumns, stats }) 
 
                 {/* ── Manual Override ── */}
                 <div className="flex flex-col gap-2 shrink-0">
-                    <p className="text-[11px] font-bold text-[#86868b] uppercase tracking-widest">
+                    <p className="text-[11px] font-medium text-[#86868b] uppercase tracking-widest">
                         Override Report Date
                     </p>
                     <div className="flex items-center gap-2">
@@ -126,7 +126,7 @@ export default function LateFeeEstimator({ parsedData, matchedColumns, stats }) 
                         {isManualOverride && (
                             <button
                                 onClick={() => setOverrideDate('')}
-                                className="text-[12px] font-bold text-[#4f86f7] hover:underline whitespace-nowrap"
+                                className="text-[12px] font-semibold text-[#4f86f7] hover:underline whitespace-nowrap"
                             >
                                 Use Estimate
                             </button>
@@ -147,7 +147,7 @@ export default function LateFeeEstimator({ parsedData, matchedColumns, stats }) 
                 <div className="bg-[#f9fafb] rounded-2xl border border-[#f0f0f0] px-6 py-5">
                     <div className="flex items-center gap-2 mb-4">
                         <Calendar size={15} className="text-[#6b7280]" />
-                        <p className="text-[12px] font-bold text-[#374151] uppercase tracking-widest">Date Timeline</p>
+                        <p className="text-[12px] font-medium text-[#374151] uppercase tracking-widest">Date Timeline</p>
                     </div>
                     <div>
                         <CalcRow
@@ -179,7 +179,7 @@ export default function LateFeeEstimator({ parsedData, matchedColumns, stats }) 
                 <div className="bg-[#f9fafb] rounded-2xl border border-[#f0f0f0] px-6 py-5">
                     <div className="flex items-center gap-2 mb-4">
                         <Info size={15} className="text-[#6b7280]" />
-                        <p className="text-[12px] font-bold text-[#374151] uppercase tracking-widest">Fee Calculation</p>
+                        <p className="text-[12px] font-medium text-[#374151] uppercase tracking-widest">Fee Calculation</p>
                     </div>
                     <div>
                         <CalcRow
@@ -238,7 +238,7 @@ export default function LateFeeEstimator({ parsedData, matchedColumns, stats }) 
             <div className={`flex items-start gap-3 px-5 py-4 rounded-2xl border ${rec.bg}`}>
                 <RecIcon size={20} className={`${rec.color} mt-0.5 shrink-0`} />
                 <div>
-                    <p className={`text-[14px] font-bold ${rec.color}`}>{rec.label}</p>
+                    <p className={`text-[14px] font-semibold ${rec.color}`}>{rec.label}</p>
                     <p className="text-[12px] text-[#6e6e73] mt-0.5">
                         {feeData.recommendation === 'worth_submitting' && feeData.isLate &&
                             `Net claim of ${fmt(feeData.netClaimValue)} after ${fmt(feeData.totalFee)} in fees is still worthwhile. Proceed with submission.`}

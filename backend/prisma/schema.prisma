@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SellerAccount {
+  id              String           @id @default(uuid())
+  sellerId        Int?             @unique
+  storeName       String
+  encryptedApiKey String
+  encryptionIv    String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  isActive        Boolean          @default(true)
+  offers          Offer[]
+  PriceChangeLog  PriceChangeLog[]
+  pricingRules    PricingRule[]
+  returns         Return[]
+  sales           Sale[]
+  syncRuns        SyncRun[]
+  transactions    Transaction[]
+  webhookEvents   WebhookEvent[]
+}
+
+model SyncRun {
+  id              String        @id @default(uuid())
+  sellerAccountId String
+  moduleSynced    String
+  status          String
+  recordsFetched  Int           @default(0)
+  errorMessage    String?
+  startedAt       DateTime      @default(now())
+  completedAt     DateTime?
+  sellerAccount   SellerAccount @relation(fields: [sellerAccountId], references: [id], onDelete: Cascade)
+}
+
+model Return {
+  id                    String        @id @default(uuid())
+  sellerAccountId       String
+  sellerReturnId        String?
+  returnReferenceNumber String?
+  orderId               String?
+  offerId               String?
+  sku                   String?
+  tsin                  String?
+  productTitle          String?
+  returnDate            DateTime?
+  status                String?
+  customerComment       String?
+  returnReason          String?
+  rawPayloadJson        Json?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  sellerAccount         SellerAccount @relation(fields: [sellerAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([sellerAccountId, returnReferenceNumber])
+}
+
+model Sale {
+  id              String        @id @default(uuid())
+  sellerAccountId String
+  orderId         String
+  orderDate       DateTime
+  orderItemStatus String
+  tsn             String
+  productTitle    String
+  sellingPrice    Float
+  rawTakealotData Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  sellerAccount   SellerAccount @relation(fields: [sellerAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([sellerAccountId, orderId, tsn])
+}
+
+model Transaction {
+  id              String        @id @default(uuid())
+  sellerAccountId String
+  transactionId   String
+  transactionDate DateTime
+  description     String
+  amount          Float
+  type            String
+  rawTakealotData Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  sellerAccount   SellerAccount @relation(fields: [sellerAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([sellerAccountId, transactionId])
+}
+
+model Offer {
+  id              String        @id @default(uuid())
+  sellerAccountId String
+  tsn             String?
+  offerId         String
+  title           String?
+  price           Float?
+  status          String?
+  rawTakealotData Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  sku             String?
+  stock           Int?
+  benchmarkPrice  Float?
+  conversionRate  Float?
+  listingQuality  Float?
+  sellerAccount   SellerAccount @relation(fields: [sellerAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([sellerAccountId, offerId])
+}
+
+model WebhookEvent {
+  id              String        @id @default(uuid())
+  sellerAccountId String
+  eventType       String
+  eventId         String?
+  payload         Json
+  processed       Boolean       @default(false)
+  receivedAt      DateTime      @default(now())
+  processedAt     DateTime?
+  sellerAccount   SellerAccount @relation(fields: [sellerAccountId], references: [id], onDelete: Cascade)
+}
+
+model PricingRule {
+  id                String        @id @default(uuid())
+  sellerAccountId   String
+  tsn               String
+  costPrice         Float?
+  minPrice          Float?
+  targetMargin      Float?
+  automationEnabled Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  maxPrice          Float?
+  pricingMode       String        @default("balanced")
+  sellerAccount     SellerAccount @relation(fields: [sellerAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([sellerAccountId, tsn])
+}
+
+model PriceChangeLog {
+  id              String        @id @default(uuid())
+  sellerAccountId String
+  offerId         String
+  tsn             String?
+  sku             String?
+  oldPrice        Float?
+  newPrice        Float
+  benchmarkPrice  Float?
+  strategy        String?
+  pricingMode     String?
+  changeSource    String
+  status          String
+  reason          String?
+  createdAt       DateTime      @default(now())
+  sellerAccount   SellerAccount @relation(fields: [sellerAccountId], references: [id], onDelete: Cascade)
+}
+
+model CompetitorSnapshot {
+  id              String   @id @default(uuid())
+  sellerAccountId String
+  tsn             String?
+  createdAt       DateTime @default(now())
+  competitorName  String   @default("Mock Competitor")
+  competitorPrice Float    @default(0)
+  isWinner        Boolean  @default(false)
+  offerId         String   @default("")
+  priceGap        Float?
+  signalSource    String   @default("mock")
+
+  @@index([sellerAccountId, offerId, createdAt])
+  @@index([sellerAccountId, tsn, createdAt])
+}
+
+model Competitor {
+  id              String   @id @default(cuid())
+  offerId         String
+  tsn             String?
+  competitorPrice Float
+  source          String
+  createdAt       DateTime @default(now())
+}

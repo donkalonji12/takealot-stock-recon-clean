@@ -37,7 +37,7 @@ export default function ProgressBar({ currentStep, stepsAvailable }) {
                   flex items-center px-5 py-3.5 text-sm font-medium rounded-2xl transition-all duration-300
                   ${containerClasses}
                 `}>
-                                <span className={`w-7 h-7 rounded-full flex items-center justify-center mr-3 text-[13px] font-bold shrink-0 transition-colors duration-300 ${circleClasses}`}>
+                                <span className={`w-7 h-7 rounded-full flex items-center justify-center mr-3 text-[13px] font-semibold shrink-0 transition-colors duration-300 ${circleClasses}`}>
                                     {isCompleted ? '✓' : step.id}
                                 </span>
                                 <span className={`hidden sm:inline ${textClasses}`}>{step.name}</span>

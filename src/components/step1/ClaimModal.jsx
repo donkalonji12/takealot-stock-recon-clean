@@ -24,7 +24,7 @@ export default function ClaimModal({ isOpen, onClose, stats, status, error, onCo
                     title: "Claim summary",
                     message: (
                         <>
-                            <p className="text-2xl sm:text-[28px] leading-tight font-bold text-[#1d1d1f] tracking-tight mb-2">
+                            <p className="text-2xl sm:text-[28px] leading-tight font-semibold text-[#1d1d1f] tracking-tight mb-2">
                                 You can claim back <span className="text-[#4f86f7] break-words">{formatCurrency(stats?.totalClaimValue || 0)}</span>
                             </p>
                             <p className="text-[15px] font-medium text-[#6e6e73]">

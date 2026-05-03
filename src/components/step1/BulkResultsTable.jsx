@@ -128,31 +128,31 @@ export default function BulkResultsTable({ batches = [], onStartClaim, onDeleteR
             {/* Aggregate Summary Cards — Row 1 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white rounded-3xl p-6 border border-[#e5e5ea] shadow-sm flex flex-col justify-center">
-                    <p className="text-[12px] font-bold text-[#86868b] uppercase tracking-widest mb-1">
+                    <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-widest mb-1">
                         {view === 'history' && !selectedBatchId ? 'Total Files Tracked' : 'Files in Session'}
                     </p>
                     <div className="flex items-baseline space-x-2">
-                        <span className="text-3xl font-bold text-[#1d1d1f] tracking-tight">{displayData.stats.total}</span>
+                        <span className="text-3xl font-semibold text-[#1d1d1f] tracking-tight">{displayData.stats.total}</span>
                         <span className="text-sm text-[#6e6e73] font-medium">reports processed</span>
                     </div>
                 </div>
 
                 <div className="bg-white rounded-3xl p-6 border border-[#e5e5ea] shadow-sm flex flex-col justify-center">
-                    <p className="text-[12px] font-bold text-[#86868b] uppercase tracking-widest mb-2">Breakdown</p>
+                    <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-widest mb-2">Breakdown</p>
                     <div className="grid grid-cols-2 gap-y-2 gap-x-4">
-                        <div className="flex items-center justify-between"><span className="text-[13px] text-[#6e6e73]">Claimable</span><span className="text-[13px] font-bold text-[#34c759]">{displayData.stats.claimable}</span></div>
-                        <div className="flex items-center justify-between"><span className="text-[13px] text-[#6e6e73]">No Claim</span><span className="text-[13px] font-bold text-[#1d1d1f]">{displayData.stats.noClaim}</span></div>
-                        <div className="flex items-center justify-between"><span className="text-[13px] text-[#6e6e73]">No Data</span><span className="text-[13px] font-bold text-[#1d1d1f]">{displayData.stats.noData}</span></div>
-                        <div className="flex items-center justify-between"><span className="text-[13px] text-[#6e6e73]">Invalid</span><span className="text-[13px] font-bold text-[#ff3b30]">{displayData.stats.invalid}</span></div>
+                        <div className="flex items-center justify-between"><span className="text-[13px] text-[#6e6e73]">Claimable</span><span className="text-[13px] font-semibold text-[#34c759]">{displayData.stats.claimable}</span></div>
+                        <div className="flex items-center justify-between"><span className="text-[13px] text-[#6e6e73]">No Claim</span><span className="text-[13px] font-semibold text-[#1d1d1f]">{displayData.stats.noClaim}</span></div>
+                        <div className="flex items-center justify-between"><span className="text-[13px] text-[#6e6e73]">No Data</span><span className="text-[13px] font-semibold text-[#1d1d1f]">{displayData.stats.noData}</span></div>
+                        <div className="flex items-center justify-between"><span className="text-[13px] text-[#6e6e73]">Invalid</span><span className="text-[13px] font-semibold text-[#ff3b30]">{displayData.stats.invalid}</span></div>
                     </div>
                 </div>
 
                 <div className={`rounded-3xl p-6 border transition-all duration-500 flex flex-col justify-center ${displayData.stats.totalValue > 0 ? 'bg-blue-50/50 border-blue-100 shadow-sm' : 'bg-white border-[#e5e5ea] shadow-sm'}`}>
-                    <p className={`text-[12px] font-bold uppercase tracking-widest mb-1 ${displayData.stats.totalValue > 0 ? 'text-blue-600' : 'text-[#86868b]'}`}>
+                    <p className={`text-[12px] font-medium uppercase tracking-widest mb-1 ${displayData.stats.totalValue > 0 ? 'text-blue-600' : 'text-[#86868b]'}`}>
                         {view === 'history' && !selectedBatchId ? 'Total Gross Claim' : 'Session Gross Claim'}
                     </p>
                     <div className="flex items-baseline space-x-2">
-                        <span className={`text-3xl font-bold tracking-tight ${displayData.stats.totalValue > 0 ? 'text-blue-600' : 'text-[#1d1d1f]'}`}>{formatCurrency(displayData.stats.totalValue)}</span>
+                        <span className={`text-3xl font-semibold tracking-tight ${displayData.stats.totalValue > 0 ? 'text-blue-600' : 'text-[#1d1d1f]'}`}>{formatCurrency(displayData.stats.totalValue)}</span>
                     </div>
                 </div>
             </div>
@@ -161,30 +161,30 @@ export default function BulkResultsTable({ batches = [], onStartClaim, onDeleteR
             {displayData.stats.claimable > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-white rounded-3xl p-6 border border-[#e5e5ea] shadow-sm flex flex-col justify-center">
-                        <p className="text-[12px] font-bold text-[#86868b] uppercase tracking-widest mb-1">Total Gross Claim</p>
+                        <p className="text-[12px] font-medium text-[#86868b] uppercase tracking-widest mb-1">Total Gross Claim</p>
                         <div className="flex items-baseline space-x-2">
-                            <span className="text-2xl font-bold text-[#1d1d1f] tracking-tight">{formatCurrency(displayData.stats.totalValue)}</span>
+                            <span className="text-2xl font-semibold text-[#1d1d1f] tracking-tight">{formatCurrency(displayData.stats.totalValue)}</span>
                         </div>
                         <p className="text-[11px] text-[#86868b] mt-1">Before late fee deductions</p>
                     </div>
                     <div className="bg-[#fffbeb] rounded-3xl p-6 border border-[#fde68a] shadow-sm flex flex-col justify-center">
                         <div className="flex items-center gap-2 mb-1">
                             <TrendingDown size={14} className="text-[#f59e0b]" />
-                            <p className="text-[12px] font-bold text-[#92400e] uppercase tracking-widest">Total Est. Late Fees</p>
+                            <p className="text-[12px] font-medium text-[#92400e] uppercase tracking-widest">Total Est. Late Fees</p>
                         </div>
                         <div className="flex items-baseline space-x-2">
-                            <span className="text-2xl font-bold text-[#92400e] tracking-tight">{formatCurrency(displayData.totalEstFees)}</span>
+                            <span className="text-2xl font-semibold text-[#92400e] tracking-tight">{formatCurrency(displayData.totalEstFees)}</span>
                         </div>
                         <p className="text-[11px] text-[#92400e]/70 mt-1">Admin + VAT (15%) across all files</p>
                     </div>
                     <div className={`rounded-3xl p-6 border shadow-sm flex flex-col justify-center ${
                         displayData.totalNetClaim > 0 ? 'bg-[#f0fdf4] border-[#bbf7d0]' : 'bg-[#fef2f2] border-[#fecaca]'
                     }`}>
-                        <p className={`text-[12px] font-bold uppercase tracking-widest mb-1 ${
+                        <p className={`text-[12px] font-medium uppercase tracking-widest mb-1 ${
                             displayData.totalNetClaim > 0 ? 'text-[#166534]' : 'text-[#991b1b]'
                         }`}>Total Net Recoverable</p>
                         <div className="flex items-baseline space-x-2">
-                            <span className={`text-2xl font-bold tracking-tight ${
+                            <span className={`text-2xl font-semibold tracking-tight ${
                                 displayData.totalNetClaim > 0 ? 'text-[#166534]' : 'text-[#991b1b]'
                             }`}>{formatCurrency(displayData.totalNetClaim)}</span>
                         </div>
@@ -221,7 +221,7 @@ export default function BulkResultsTable({ batches = [], onStartClaim, onDeleteR
                             </select>
                         )}
                         {selectedBatchId && (
-                            <button onClick={() => setSelectedBatchId(null)} className="text-[13px] font-bold text-[#4f86f7] hover:underline px-3 transition-all">Back to List</button>
+                            <button onClick={() => setSelectedBatchId(null)} className="text-[13px] font-semibold text-[#4f86f7] hover:underline px-3 transition-all">Back to List</button>
                         )}
                     </div>
                 </div>
@@ -237,13 +237,13 @@ export default function BulkResultsTable({ batches = [], onStartClaim, onDeleteR
                                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[#6e6e73] font-medium">
                                             <span>{batch.stats?.total} files</span>
                                             <span className="text-[#34c759]">{batch.stats?.claimable} claimable</span>
-                                            <span className="font-bold text-[#1d1d1f]">{formatCurrency(batch.stats?.totalValue)}</span>
+                                            <span className="font-semibold text-[#1d1d1f]">{formatCurrency(batch.stats?.totalValue)}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 self-end sm:self-auto">
                                     <button onClick={() => onDeleteBatch(batch.id)} className="p-2 text-[#86868b] hover:text-[#ff3b30] rounded-full transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"><Trash2 size={18} /></button>
-                                    <button onClick={() => setSelectedBatchId(batch.id)} className="bg-[#f5f5f7] hover:bg-[#e5e5ea] text-[#1d1d1f] px-5 py-2.5 rounded-xl font-bold text-[12px] transition-all flex items-center shadow-sm min-h-[44px]">Open <span>&rarr;</span></button>
+                                    <button onClick={() => setSelectedBatchId(batch.id)} className="bg-[#f5f5f7] hover:bg-[#e5e5ea] text-[#1d1d1f] px-5 py-2.5 rounded-xl font-semibold text-[12px] transition-all flex items-center shadow-sm min-h-[44px]">Open <span>&rarr;</span></button>
                                 </div>
                             </div>
                         ))}
@@ -268,33 +268,33 @@ export default function BulkResultsTable({ batches = [], onStartClaim, onDeleteR
                                                 <p className="font-semibold text-[14px] text-[#1d1d1f] truncate">{r.filename}</p>
                                                 <p className="text-[12px] text-[#6e6e73] mt-0.5">{formatReconPeriod(r.reconPeriod)}</p>
                                             </div>
-                                            <span className={`inline-block shrink-0 px-3 py-1 text-[10px] font-bold rounded-full border tracking-wide uppercase ${getStatusStyle(r.status)}`}>{r.status}</span>
+                                            <span className={`inline-block shrink-0 px-3 py-1 text-[10px] font-semibold rounded-full border tracking-wide uppercase ${getStatusStyle(r.status)}`}>{r.status}</span>
                                         </div>
                                         {/* Row 2: key metrics */}
                                         <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                                             <div>
-                                                <p className="text-[11px] text-[#86868b] font-bold uppercase tracking-wide">Claim Value</p>
-                                                <p className="text-[14px] font-bold text-[#1d1d1f]">{r.stats?.totalClaimValue > 0 ? formatCurrency(r.stats.totalClaimValue) : '—'}</p>
+                                                <p className="text-[11px] text-[#86868b] font-medium uppercase tracking-wide">Claim Value</p>
+                                                <p className="text-[14px] font-semibold text-[#1d1d1f]">{r.stats?.totalClaimValue > 0 ? formatCurrency(r.stats.totalClaimValue) : '—'}</p>
                                             </div>
                                             <div>
-                                                <p className="text-[11px] text-[#86868b] font-bold uppercase tracking-wide">Net Claim</p>
-                                                <p className={`text-[14px] font-bold ${netColor}`}>{fd ? formatCurrency(fd.netClaimValue) : '—'}</p>
+                                                <p className="text-[11px] text-[#86868b] font-medium uppercase tracking-wide">Net Claim</p>
+                                                <p className={`text-[14px] font-semibold ${netColor}`}>{fd ? formatCurrency(fd.netClaimValue) : '—'}</p>
                                             </div>
                                             <div>
-                                                <p className="text-[11px] text-[#86868b] font-bold uppercase tracking-wide">Months Late</p>
-                                                <p className={`text-[14px] font-bold ${fd && fd.monthsLate > 0 ? 'text-[#d97706]' : 'text-[#6b7280]'}`}>{fd ? (fd.monthsLate > 0 ? fd.monthsLate : '—') : '—'}</p>
+                                                <p className="text-[11px] text-[#86868b] font-medium uppercase tracking-wide">Months Late</p>
+                                                <p className={`text-[14px] font-semibold ${fd && fd.monthsLate > 0 ? 'text-[#d97706]' : 'text-[#6b7280]'}`}>{fd ? (fd.monthsLate > 0 ? fd.monthsLate : '—') : '—'}</p>
                                             </div>
                                             <div>
-                                                <p className="text-[11px] text-[#86868b] font-bold uppercase tracking-wide">Recommendation</p>
+                                                <p className="text-[11px] text-[#86868b] font-medium uppercase tracking-wide">Recommendation</p>
                                                 {recMeta ? (
-                                                    <span className={`inline-block mt-0.5 px-2.5 py-1 text-[10px] font-bold rounded-full border ${recMeta.bg} ${recMeta.color}`}>{recMeta.short}</span>
+                                                    <span className={`inline-block mt-0.5 px-2.5 py-1 text-[10px] font-semibold rounded-full border ${recMeta.bg} ${recMeta.color}`}>{recMeta.short}</span>
                                                 ) : <span className="text-[#d1d5db] text-[13px]">—</span>}
                                             </div>
                                         </div>
                                         {/* Row 3: actions */}
                                         <div className="flex items-center gap-2 pt-1">
                                             <button onClick={() => onDeleteRecord(r.id, r.batchId)} className="p-2.5 text-[#86868b] hover:text-[#ff3b30] transition-all rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center border border-[#f0f0f0]"><Trash2 size={16} /></button>
-                                            <button onClick={() => onStartClaim(r)} disabled={r.status !== 'Claimable'} className={`flex-1 py-3 font-bold text-[13px] rounded-full transition-all min-h-[44px] ${r.status === 'Claimable' ? 'bg-[#4f86f7] text-white hover:bg-blue-600 shadow-sm' : 'bg-[#f5f5f7] text-[#a1a1a6] border border-[#e5e5ea] cursor-not-allowed'}`}>
+                                            <button onClick={() => onStartClaim(r)} disabled={r.status !== 'Claimable'} className={`flex-1 py-3 font-semibold text-[13px] rounded-full transition-all min-h-[44px] ${r.status === 'Claimable' ? 'bg-[#4f86f7] text-white hover:bg-blue-600 shadow-sm' : 'bg-[#f5f5f7] text-[#a1a1a6] border border-[#e5e5ea] cursor-not-allowed'}`}>
                                                 {r.status === 'Claimable' ? 'Start Claim →' : 'Not Claimable'}
                                             </button>
                                         </div>
@@ -332,10 +332,10 @@ export default function BulkResultsTable({ batches = [], onStartClaim, onDeleteR
                                             <tr key={r.id} className="border-b border-[#f5f5f7] hover:bg-[#fbfbfd] transition-all last:border-b-0 group">
                                                 <td className="py-5 px-6 font-semibold text-[#1d1d1f] max-w-[180px] truncate">{r.filename}</td>
                                                 <td className="py-5 px-4 font-medium text-[#4b5563] whitespace-nowrap">{formatReconPeriod(r.reconPeriod)}</td>
-                                                <td className="py-5 px-4 text-right font-bold text-[#1d1d1f] whitespace-nowrap">{r.stats?.totalClaimValue > 0 ? formatCurrency(r.stats.totalClaimValue) : '—'}</td>
+                                                <td className="py-5 px-4 text-right font-semibold text-[#1d1d1f] whitespace-nowrap">{r.stats?.totalClaimValue > 0 ? formatCurrency(r.stats.totalClaimValue) : '—'}</td>
                                                 <td className="py-5 px-4 text-center">
                                                     {fd ? (
-                                                        <span className={`text-[13px] font-bold ${fd.monthsLate > 0 ? 'text-[#d97706]' : 'text-[#16a34a]'}`}>
+                                                        <span className={`text-[13px] font-semibold ${fd.monthsLate > 0 ? 'text-[#d97706]' : 'text-[#16a34a]'}`}>
                                                             {fd.monthsLate > 0 ? fd.monthsLate : '—'}
                                                         </span>
                                                     ) : <span className="text-[#d1d5db]">—</span>}
@@ -347,21 +347,21 @@ export default function BulkResultsTable({ batches = [], onStartClaim, onDeleteR
                                                         </span>
                                                     ) : <span className="text-[#d1d5db]">—</span>}
                                                 </td>
-                                                <td className={`py-5 px-4 text-right font-bold whitespace-nowrap ${netColor}`}>
+                                                <td className={`py-5 px-4 text-right font-semibold whitespace-nowrap ${netColor}`}>
                                                     {fd ? formatCurrency(fd.netClaimValue) : '—'}
                                                 </td>
                                                 <td className="py-5 px-4 text-center">
                                                     {recMeta ? (
-                                                        <span className={`inline-block px-3 py-1 text-[10px] font-bold rounded-full border tracking-wide ${recMeta.bg} ${recMeta.color}`}>
+                                                        <span className={`inline-block px-3 py-1 text-[10px] font-semibold rounded-full border tracking-wide ${recMeta.bg} ${recMeta.color}`}>
                                                             {recMeta.short}
                                                         </span>
                                                     ) : <span className="text-[#d1d5db]">—</span>}
                                                 </td>
-                                                <td className="py-5 px-4 text-center"><span className={`inline-block px-3 py-1.5 text-[10px] font-bold rounded-full border tracking-wide uppercase ${getStatusStyle(r.status)}`}>{r.status}</span></td>
+                                                <td className="py-5 px-4 text-center"><span className={`inline-block px-3 py-1.5 text-[10px] font-semibold rounded-full border tracking-wide uppercase ${getStatusStyle(r.status)}`}>{r.status}</span></td>
                                                 <td className="py-5 px-6 text-right whitespace-nowrap">
                                                     <div className="flex justify-end items-center space-x-2">
                                                         <button onClick={() => onDeleteRecord(r.id, r.batchId)} className="p-2 text-[#86868b] hover:text-[#ff3b30] opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={18} /></button>
-                                                        <button onClick={() => onStartClaim(r)} disabled={r.status !== 'Claimable'} className={`px-4 py-2 font-bold text-[12px] rounded-full transition-all ${r.status === 'Claimable' ? 'bg-[#4f86f7] text-white hover:bg-blue-600 shadow-sm' : 'bg-[#f5f5f7] text-[#a1a1a6] border border-[#e5e5ea] cursor-not-allowed'}`}>Claim &rarr;</button>
+                                                        <button onClick={() => onStartClaim(r)} disabled={r.status !== 'Claimable'} className={`px-4 py-2 font-semibold text-[12px] rounded-full transition-all ${r.status === 'Claimable' ? 'bg-[#4f86f7] text-white hover:bg-blue-600 shadow-sm' : 'bg-[#f5f5f7] text-[#a1a1a6] border border-[#e5e5ea] cursor-not-allowed'}`}>Claim &rarr;</button>
                                                     </div>
                                                 </td>
                                             </tr>

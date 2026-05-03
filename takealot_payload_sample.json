@@ -1,0 +1,29 @@
+{
+  "return_reference_number": "RRN-6VZ4X-4DWR",
+  "return_region": "JHB",
+  "return_reason": "defective_or_damaged",
+  "return_date": "2026-04-09",
+  "outcomes": [
+    {
+      "outcome_id": 13132672,
+      "status": "removal_order"
+    }
+  ],
+  "offer_id": 229125642,
+  "order_id": 204076618,
+  "tsin_id": 102439744,
+  "customer_comment": "Product not sucking enough",
+  "quantity": 1,
+  "seller_return_id": 7469147,
+  "sku": "817-850378003745",
+  "transactions": [
+    {
+      "transaction_type": "reversal-success-fee",
+      "amount_incl_vat": 216.31
+    },
+    {
+      "transaction_type": "reversal-customer-order",
+      "amount_incl_vat": -1881
+    }
+  ]
+}

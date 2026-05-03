@@ -27,10 +27,10 @@ export default function FlaggedClaims({ data, matchedColumns }) {
                     <table className="min-w-full">
                         <thead>
                             <tr className="border-b border-[#e5e5ea]">
-                                <th className="px-10 py-5 text-left text-[11px] font-bold text-[#86868b] uppercase tracking-wider">Product Title</th>
-                                <th className="px-10 py-5 text-left text-[11px] font-bold text-[#86868b] uppercase tracking-wider">TSIN</th>
-                                <th className="px-10 py-5 text-left text-[11px] font-bold text-[#86868b] uppercase tracking-wider">SKU</th>
-                                <th className="px-10 py-5 text-right text-[11px] font-bold text-[#86868b] uppercase tracking-wider">Claim Value</th>
+                                <th className="px-10 py-5 text-left text-[11px] font-medium text-[#86868b] uppercase tracking-wider">Product Title</th>
+                                <th className="px-10 py-5 text-left text-[11px] font-medium text-[#86868b] uppercase tracking-wider">TSIN</th>
+                                <th className="px-10 py-5 text-left text-[11px] font-medium text-[#86868b] uppercase tracking-wider">SKU</th>
+                                <th className="px-10 py-5 text-right text-[11px] font-medium text-[#86868b] uppercase tracking-wider">Claim Value</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white">

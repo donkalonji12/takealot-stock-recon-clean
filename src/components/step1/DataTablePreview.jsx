@@ -39,7 +39,7 @@ export default function DataTablePreview({ data, headers, matchedColumns }) {
                     <thead>
                         <tr className="border-b border-[#e5e5ea]">
                             {orderedHeaders.map((h, i) => (
-                                <th key={i} className="px-10 py-5 text-left text-[11px] font-bold text-[#86868b] uppercase tracking-wider whitespace-nowrap">
+                                <th key={i} className="px-10 py-5 text-left text-[11px] font-medium text-[#86868b] uppercase tracking-wider whitespace-nowrap">
                                     {h}
                                 </th>
                             ))}
